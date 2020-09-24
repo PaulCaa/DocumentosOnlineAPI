@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Users\\paulcaa\\Documentos\\Desarrollo\\dotnet\\DocumentosOnlineAPI\\DocumentosOnlineAPI.csproj": {}
+    "D:\\Users\\paulcaa\\Documentos\\Desarrollo\\dotnet\\GitHub\\DocumentosOnlineAPI\\DocumentosOnlineAPI.csproj": {}
   },
   "projects": {
-    "D:\\Users\\paulcaa\\Documentos\\Desarrollo\\dotnet\\DocumentosOnlineAPI\\DocumentosOnlineAPI.csproj": {
+    "D:\\Users\\paulcaa\\Documentos\\Desarrollo\\dotnet\\GitHub\\DocumentosOnlineAPI\\DocumentosOnlineAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Users\\paulcaa\\Documentos\\Desarrollo\\dotnet\\DocumentosOnlineAPI\\DocumentosOnlineAPI.csproj",
+        "projectUniqueName": "D:\\Users\\paulcaa\\Documentos\\Desarrollo\\dotnet\\GitHub\\DocumentosOnlineAPI\\DocumentosOnlineAPI.csproj",
         "projectName": "DocumentosOnlineAPI",
-        "projectPath": "D:\\Users\\paulcaa\\Documentos\\Desarrollo\\dotnet\\DocumentosOnlineAPI\\DocumentosOnlineAPI.csproj",
+        "projectPath": "D:\\Users\\paulcaa\\Documentos\\Desarrollo\\dotnet\\GitHub\\DocumentosOnlineAPI\\DocumentosOnlineAPI.csproj",
         "packagesPath": "C:\\Users\\paulcaa\\.nuget\\packages\\",
-        "outputPath": "D:\\Users\\paulcaa\\Documentos\\Desarrollo\\dotnet\\DocumentosOnlineAPI\\obj\\",
+        "outputPath": "D:\\Users\\paulcaa\\Documentos\\Desarrollo\\dotnet\\GitHub\\DocumentosOnlineAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\paulcaa\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -38,6 +38,20 @@
       "frameworks": {
         "netcoreapp3.1": {
           "dependencies": {
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.1.8, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[3.1.8, )"
+            },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[3.1.4, )"
+            },
             "NSwag.aspnetcore": {
               "target": "Package",
               "version": "[13.7.4, )"

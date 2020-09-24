@@ -9,9 +9,13 @@ namespace DocumentosOnlineAPI.Models
     {
         [Key]
         public int IdPermiso { set; get; }
+        [ForeignKey("IdEmpresa")]
         public Empresa Empresa { set; get; }
+        [ForeignKey("IdSector")]
         public Sector Sector { set; get; }
+        [ForeignKey("IdDocumento")]
         public Documento Documento { set; get; }
+        [ForeignKey("IdUsuario")]
         public Usuario Usuario { set; get; }
     }
 }

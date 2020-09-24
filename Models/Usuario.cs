@@ -12,9 +12,12 @@ namespace DocumentosOnlineAPI.Models
         public string Nombre { set; get; }
         public string Apellido { set; get; }
         [Required]
+        [StringLength(100)]
         public string Email { set; get; }
         [Required]
+        [StringLength(100)]
         public string HashPwd { set; get; }
+        [Required]
         public Empresa Empresa { set; get; }
     }
 }

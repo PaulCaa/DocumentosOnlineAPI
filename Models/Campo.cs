@@ -8,7 +8,11 @@ namespace DocumentosOnlineAPI.Models{
     {
         [Key]
         public int idCampo { set; get; }
+        [Required]
+        [StringLength(30)]
         public string Nombre { set; get; }
+        [Required]
+        [StringLength(50)]
         public string Valor { set; get; }
     }
 }

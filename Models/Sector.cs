@@ -9,8 +9,10 @@ namespace DocumentosOnlineAPI.Models
     {
         [Key]
         public int IdSector { set; get; }
+        [Required]
         [StringLength(50)]
         public string Nombre { set; get; }
+        [ForeignKey("IdEmpresa")]
         public Empresa Empresa { set; get; }
     }
 }

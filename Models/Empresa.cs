@@ -9,8 +9,10 @@ namespace DocumentosOnlineAPI.Models
     {
         [Key]
         public int IdEmpresa { set; get; }
+        [Required]
         [StringLength(100)]
         public string Nombre { set; get; }
+        [Column("Descripcion", TypeName = "nText")]
         public string Descripcion { set; get; }
 
     }
