@@ -8,7 +8,7 @@ namespace DocumentosOnlineAPI.Models
     public class Empresa
     {
         [Key]
-        public int IdEmpresa { set; get; }
+        public int EmpresaId { set; get; }
         [Required]
         [StringLength(100)]
         public string Nombre { set; get; }

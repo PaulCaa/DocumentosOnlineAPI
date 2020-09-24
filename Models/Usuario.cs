@@ -8,7 +8,7 @@ namespace DocumentosOnlineAPI.Models
     public class Usuario
     {
         [Key]
-        public int IdUsuario { set; get; }
+        public int UsuarioId { set; get; }
         public string Nombre { set; get; }
         public string Apellido { set; get; }
         [Required]
@@ -17,7 +17,8 @@ namespace DocumentosOnlineAPI.Models
         [Required]
         [StringLength(100)]
         public string HashPwd { set; get; }
-        [Required]
+        [ForeignKey("EmpresaId")]
         public Empresa Empresa { set; get; }
+        public List<Permiso> Permisos { set; get; }
     }
 }

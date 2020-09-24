@@ -8,11 +8,11 @@ namespace DocumentosOnlineAPI.Models
     public class Sector
     {
         [Key]
-        public int IdSector { set; get; }
+        public int SectorId { set; get; }
         [Required]
         [StringLength(50)]
         public string Nombre { set; get; }
-        [ForeignKey("IdEmpresa")]
+        [ForeignKey("EmpresaId")]
         public Empresa Empresa { set; get; }
     }
 }

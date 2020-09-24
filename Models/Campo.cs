@@ -7,12 +7,13 @@ namespace DocumentosOnlineAPI.Models{
     public class Campo
     {
         [Key]
-        public int idCampo { set; get; }
+        public int CampoId { set; get; }
         [Required]
         [StringLength(30)]
         public string Nombre { set; get; }
         [Required]
         [StringLength(50)]
         public string Valor { set; get; }
+        public List<DocumentoCampo> DocumentoCampos { set; get; }
     }
 }

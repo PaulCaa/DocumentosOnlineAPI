@@ -8,14 +8,14 @@ namespace DocumentosOnlineAPI.Models
     public class Documento
     {
         [Key]
-        public int IdDocumento { set; get; }
+        public int DocumentoId { set; get; }
         [StringLength(50)]
         public string Nombre { set; get; }
-        [ForeignKey("IdEmpresa")]
+        [ForeignKey("EmpresaId")]
         public Empresa Empresa { set; get; }
-        [ForeignKey("IdSector")]
+        [ForeignKey("SectorId")]
         public Sector Sector { set; get; }
         [Required]
-        public List<Campo> Campos { set; get; }
+        public List<DocumentoCampo> DocumentoCampos { set; get; }
     }
 }

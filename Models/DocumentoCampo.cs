@@ -5,11 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DocumentosOnlineAPI.Models
 {
-    public class UsuarioDocumento
+    public class DocumentoCampo
     {
-        [ForeignKey("IdUsuario")]
-        public Usuario Usuario { set; get; }
-        [ForeignKey("IdDocumento")]
+        [ForeignKey("DocumentoId")]
+        public int DocumentoId { set; get; }
         public Documento Documento { set; get; }
+        [ForeignKey("CampoId")]
+        public int CampoId { set; get; }
+        public Campo Campo { set; get; }
     }
 }
