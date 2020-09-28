@@ -10,9 +10,14 @@ namespace DocumentosOnlineAPI.Models.Rest
         public string Message { set; get; }
         public List<ResponseError> Errors { set; get; }
 
-        public ResponseHeader()
-        {
+        public ResponseHeader() {
             this.Errors = new List<ResponseError>();
+        }
+
+        public override string ToString() {
+            return "{\"ResultCode\": \"" + ResultCode + "\", "
+            + "\"Message\": \"" + Message + "\", "
+            + "\"Errors\"; \"" + Errors.ToString() + "\"}";
         }
     }
 }

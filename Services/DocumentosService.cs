@@ -16,8 +16,7 @@ namespace DocumentosOnlineAPI.Services {
         public List<Documento> FindDocumentsByEmpresa(int id){
             try{
                 Console.WriteLine("Buscando documentos en base de datos");
-                List<Documento> docs = DbContext.Documentos.Where(d => d.Empresa.EmpresaId == id).ToList();
-                return docs;
+                return DbContext.Documentos.Where(d => d.Empresa.EmpresaId == id).ToList();
             }catch(Exception exception){
                 Console.WriteLine("Error en proceso de lectura en base de datos");
                 throw new DocumentosDatabaseException("Error en proceso de lectura en base de datos",exception);

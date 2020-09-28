@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,45 +24,61 @@ namespace DocumentosOnlineAPI.Controllers {
         [HttpGet]
         public IActionResult GetAll(){
             try{
-                RestResponse response = RestUtils.GenerateResponseOkWithData(
-                    empresasService.ListAllEmpresas()
-                );
+                Console.WriteLine("Se van a listar las empresas");
+                List<Empresa> result = empresasService.ListAllEmpresas();
+                if(result == null){
+                    result = new List<Empresa>();
+                }
+                string empStr = "";
+                foreach(Empresa e in result){
+                    empStr += e.Nombre + " ";
+                }
+                Console.WriteLine("Resultado de busqueda: " + empStr);
+                RestResponse response = RestUtils.GenerateResponseOkWithData(result.ToString());
                 return Ok(response);
             }catch(Exception exception){
+                Console.WriteLine(RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                RestResponse response = RestUtils.GenerateResponseErrorWith(
+                    new ResponseError(
+                        exception.Message,
+                        exception.GetType().ToString()
+                    )
+                );
+                response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
                 return StatusCode(
                     StatusCodes.Status500InternalServerError,
-                    RestUtils.GenerateResponseErrorWith(
-                        new ResponseError(
-                            RestUtils.INTERNAL_ERROR_MSG,
-                            exception.Message,
-                            exception
-                        )
-                    )
+                    response
                 );
             }
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet("/api/empresas/{id}")]
         public IActionResult GetDocumentsByEmpresa(int id){
             try{
-                RestResponse response = RestUtils.GenerateResponseOkWithData(
-                    empresasService.FindEmpresaBy(id)
-                );
+                Console.WriteLine("Se va a buscar empresa con id: " + id);
+                Empresa result = empresasService.FindEmpresaBy(id);
+                if(result == null){
+                    result = new Empresa();
+                }
+                Console.WriteLine("Resultado de busqueda: " + result.ToString());
+                RestResponse response = RestUtils.GenerateResponseOkWithData(result);
                 return Ok(response);
             }catch(Exception exception){
+                Console.WriteLine(RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                RestResponse response = RestUtils.GenerateResponseErrorWith(
+                    new ResponseError(
+                        exception.Message,
+                        exception.GetType().ToString()
+                    )
+                );
+                response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
                 return StatusCode(
                     StatusCodes.Status500InternalServerError,
-                    RestUtils.GenerateResponseErrorWith(
-                        new ResponseError(
-                            RestUtils.INTERNAL_ERROR_MSG,
-                            exception.Message,
-                            exception
-                        )
-                    )
+                    response
                 );
             }
         }
-        
+
     }
 }

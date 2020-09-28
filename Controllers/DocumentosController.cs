@@ -27,18 +27,19 @@ namespace DocumentosOnlineAPI.Controllers {
                 List<Documento> docs = documentosService.FindDocumentsByEmpresa(id);
                 Console.WriteLine(docs.ToString());
                 RestResponse response = RestUtils.GenerateResponseOkWithData(docs);
-
-                return Ok("response");
+                return Ok(response);
             }catch(Exception exception){
+                Console.WriteLine(RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                RestResponse response = RestUtils.GenerateResponseErrorWith(
+                    new ResponseError(
+                        exception.Message,
+                        exception.GetType().ToString()
+                    )
+                );
+                response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
                 return StatusCode(
                     StatusCodes.Status500InternalServerError,
-                    RestUtils.GenerateResponseErrorWith(
-                        new ResponseError(
-                            RestUtils.INTERNAL_ERROR_MSG,
-                            exception.Message,
-                            exception
-                        )
-                    )
+                    response
                 );
             }
         }
