@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DocumentosOnlineAPI.Models
-{
-    public class Documento
-    {
+namespace DocumentosOnlineAPI.Models {
+    public class Documento {
         [Key]
         public int DocumentoId { set; get; }
         [StringLength(50)]
@@ -17,5 +15,13 @@ namespace DocumentosOnlineAPI.Models
         public Sector Sector { set; get; }
         [Required]
         public List<DocumentoCampo> DocumentoCampos { set; get; }
+
+        public override string ToString(){
+            return "{\"DocumentoId\": \"" + DocumentoId + "\", "
+            + "\"Nombre\": \"" + Nombre + "\", "
+            + "\"Empresa\": \"" + Empresa.ToString() + "\", "
+            + "\"Sector\": \"" + Sector.ToString() + "\", "
+            + "\"DocumentoCampos\": \"" + DocumentoCampos.ToString() + "\"}";
+        }
     }
 }

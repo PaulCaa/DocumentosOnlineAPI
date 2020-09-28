@@ -14,5 +14,11 @@ namespace DocumentosOnlineAPI.Models
         public string Nombre { set; get; }
         [ForeignKey("EmpresaId")]
         public Empresa Empresa { set; get; }
+
+        public override string ToString(){
+            return "{\"SectorId\": \"" + SectorId + "\", "
+            + "\"Nombre\": \"" + Nombre + "\", "
+            + "\"Empresa\": \"" + Empresa.ToString() + "\"}";
+        }
     }
 }

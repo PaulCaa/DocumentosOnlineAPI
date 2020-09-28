@@ -9,5 +9,18 @@ namespace DocumentosOnlineAPI.Models.Rest
         public string Message { set; get; }
         public string Description { set; get; }
         public Exception Cause { set; get; }
+
+        public ResponseError() {}
+
+        public ResponseError(string message, string description){
+            this.Message = message;
+            this.Description = description;
+        }
+
+        public ResponseError(string message, string description, Exception cause){
+            this.Message = message;
+            this.Description = description;
+            this.Cause = cause;
+        }
     }
 }

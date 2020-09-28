@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DocumentosOnlineAPI.Models{
-    public class Campo
-    {
+namespace DocumentosOnlineAPI.Models {
+    public class Campo {
         [Key]
         public int CampoId { set; get; }
         [Required]
@@ -15,5 +14,11 @@ namespace DocumentosOnlineAPI.Models{
         [StringLength(50)]
         public string Valor { set; get; }
         public List<DocumentoCampo> DocumentoCampos { set; get; }
+
+        public override string ToString(){
+            return "{\"CampoId\": \"" + CampoId + "\", "
+            + "\"Nombre\": \"" + Nombre + "\", "
+            + "\"Valor\": \"" + Valor + "\"}";
+        }
     }
 }

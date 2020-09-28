@@ -7,6 +7,6 @@ namespace DocumentosOnlineAPI.Models.Rest
     public class RestResponse : ActionResult
     {
         public ResponseHeader Header { set; get; }
-        public List<Object> Data { set; get; }
+        public string Data { set; get; }
     }
 }

@@ -12,8 +12,8 @@ namespace DocumentosOnlineAPI.Controllers
     {
         
 
-        [HttpGet()]
-        public IActionResult Get()
+        [HttpGet("{id}")]
+        public IActionResult Get(int id)
         {
             return Ok();
         }

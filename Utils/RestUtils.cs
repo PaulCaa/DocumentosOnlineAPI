@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using DocumentosOnlineAPI.Models;
 using DocumentosOnlineAPI.Models.Rest;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DocumentosOnlineAPI.Utils
 {
     public class RestUtils
     {
-
+        public const string INTERNAL_ERROR_MSG = "Error interno";
         private const string RESPONSE_CODE_OK = "OK";
         private const string RESPONSE_CODE_MSG = "Request sucess";
         private const string RESPONSE_CODE_ERROR = "ERROR";
@@ -18,18 +21,18 @@ namespace DocumentosOnlineAPI.Utils
             header.ResultCode = RESPONSE_CODE_OK;
             header.Message = RESPONSE_CODE_MSG;
             response.Header = header;
-            response.Data = new List<object>();
+            response.Data = "";
             return response;
         }
 
-        public static RestResponse GenerateResponseOkWithData(List<Object> dataList)
+        public static RestResponse GenerateResponseOkWithData(Object data)
         {
             RestResponse response = new RestResponse();
             ResponseHeader header = new ResponseHeader();
             header.ResultCode = RESPONSE_CODE_OK;
             header.Message = RESPONSE_CODE_MSG;
             response.Header = header;
-            response.Data = dataList;
+            response.Data = JsonSerializer.Serialize(data);
             return response;
         }
 
@@ -38,7 +41,7 @@ namespace DocumentosOnlineAPI.Utils
             ResponseHeader header = new ResponseHeader();
             header.ResultCode = RESPONSE_CODE_ERROR;
             response.Header = header;
-            response.Data = new List<object>();
+            response.Data = "";
             return response;
         }
 
@@ -50,7 +53,7 @@ namespace DocumentosOnlineAPI.Utils
             header.ResultCode = RESPONSE_CODE_ERROR;
             header.Errors = errors;
             response.Header = header;
-            response.Data = new List<object>();
+            response.Data = "";
             return response;
         }
 
@@ -60,7 +63,7 @@ namespace DocumentosOnlineAPI.Utils
             header.ResultCode = RESPONSE_CODE_ERROR;
             header.Errors = errors;
             response.Header = header;
-            response.Data = new List<object>();
+            response.Data = "";
             return response;
         }
     }
