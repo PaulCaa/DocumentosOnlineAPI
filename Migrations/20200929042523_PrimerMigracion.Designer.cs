@@ -4,14 +4,16 @@ using DocumentosOnlineAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DocumentosOnlineAPI.Migrations
 {
     [DbContext(typeof(DocumentosDbContext))]
-    partial class DocumentosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200929042523_PrimerMigracion")]
+    partial class PrimerMigracion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

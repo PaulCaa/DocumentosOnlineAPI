@@ -9,7 +9,6 @@ using DocumentosOnlineAPI.Services;
 using DocumentosOnlineAPI.Models;
 using DocumentosOnlineAPI.Models.Rest;
 using DocumentosOnlineAPI.Utils;
-using DocumentosOnlineAPI.Data;
 
 namespace DocumentosOnlineAPI.Controllers {
 
@@ -25,7 +24,7 @@ namespace DocumentosOnlineAPI.Controllers {
         }
 
         [HttpGet]
-        public IActionResult GetAllEmpresas(){
+        public IActionResult GetAllEmpresas() {
             try{
                 Console.WriteLine("[GetAllEmpresas] -> listar todas las empresas");
                 List<Empresa> result = empresasService.ListAllEmpresas();
@@ -39,7 +38,7 @@ namespace DocumentosOnlineAPI.Controllers {
                 RestResponse response = RestUtils.GenerateResponseOkWithData(result);
                 return Ok(response);
             }catch(Exception exception){
-                Console.WriteLine("[GetDocumentsByEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                Console.WriteLine("[GetAllEmpresas] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 RestResponse response = RestUtils.GenerateResponseErrorWith(
                     new ResponseError(
                         exception.Message,
@@ -56,7 +55,7 @@ namespace DocumentosOnlineAPI.Controllers {
 
 
         [HttpGet("/api/empresa/{id}")]
-        public IActionResult GetDocumentsByEmpresa(int id){
+        public IActionResult GetDocumentsByEmpresa(int id) {
             try{
                 Console.WriteLine("[GetDocumentsByEmpresa] -> buscar empresa con id: " + id);
                 Empresa result = empresasService.FindEmpresaBy(id);
@@ -92,7 +91,7 @@ namespace DocumentosOnlineAPI.Controllers {
                 Console.WriteLine("[GetSectoresByEmpresa] -> listar sectores de la empresa id: " + id);
                 List<Sector> result = sectoresService.ListarSectoresPorEmpresa(id);
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
-                if(result == null){
+                if(result == null || result.Count() == 0){
                     Console.WriteLine("[GetSectoresByEmpresa] -> no hay resultados");
                     response.Header.Message = RestUtils.RESPONSE_NOTFOUND_MSG;
                     return NotFound(response);

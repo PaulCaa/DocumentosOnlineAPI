@@ -13,16 +13,19 @@ namespace DocumentosOnlineAPI.Services {
             try{
                 Console.WriteLine("[SectoresService] -> buscando sectores en base de datos");
                 using(DocumentosDbContext db = new DocumentosDbContext()) {
-                    sectores = db.Sectores.ToList();
+                    sectores = db.Sectores.Where(s => s.Empresa.EmpresaId == id).ToList();
                 }
                 string str = "[";
                 foreach(Sector o in sectores) str += o.ToString();
                 str += "]";
                 Console.WriteLine("[SectoresService] -> se encontraron: " + str);
                 return sectores;
+            } catch(InvalidOperationException exception) {
+                Console.WriteLine("[SectoresService] -> " + exception.GetType().ToString() + ": " + exception.Message);
+                return null;
             } catch (Exception exception) {
                 Console.WriteLine("[SectoresService] -> se produjo un error error en acceso a la base de datos");
-                Console.WriteLine(exception.Message);
+                Console.WriteLine("[SectoresService] -> " + exception.GetType().ToString() + ": " + exception.Message);
                 throw new DocumentosDatabaseException("Se produjo un error error en acceso a la base de datos",exception);
             }
         }
@@ -40,9 +43,12 @@ namespace DocumentosOnlineAPI.Services {
                 }
                 Console.WriteLine("[SectoresService] -> resultado: " + sector.ToString());
                 return sector;
+            } catch(InvalidOperationException exception) {
+                Console.WriteLine("[SectoresService] -> " + exception.GetType().ToString() + ": " + exception.Message);
+                return null;
             } catch (Exception exception) {
                 Console.WriteLine("[SectoresService] -> se produjo un error error en acceso a la base de datos");
-                Console.WriteLine(exception.Message);
+                Console.WriteLine("[SectoresService] -> " + exception.GetType().ToString() + ": " + exception.Message);
                 throw new DocumentosDatabaseException("Se produjo un error error en acceso a la base de datos",exception);
             }
         }
