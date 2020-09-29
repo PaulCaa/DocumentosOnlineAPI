@@ -5,9 +5,10 @@ using DocumentosOnlineAPI.Models.Rest;
 
 namespace DocumentosOnlineAPI.Utils {
     public class RestUtils {
-        private const string RESPONSE_CODE_OK = "OK";
-        private const string RESPONSE_OK_MSG = "Request sucess";
-        private const string RESPONSE_CODE_ERROR = "ERROR";
+        public const string RESPONSE_CODE_OK = "OK";
+        public const string RESPONSE_OK_MSG = "Request exitosa";
+        public const string RESPONSE_NOTFOUND_MSG = "No hay resultados";
+        public const string RESPONSE_CODE_ERROR = "ERROR";
         public const string RESPONSE_INTERNAL_ERROR_MSG = "Error interno";
 
         public static RestResponse GenerateResponseOkEmpty()
@@ -17,37 +18,36 @@ namespace DocumentosOnlineAPI.Utils {
             header.ResultCode = RESPONSE_CODE_OK;
             header.Message = RESPONSE_OK_MSG;
             response.Header = header;
-            response.Data = new List<Object>();
             return response;
         }
 
-        public static RestResponse GenerateResponseOkWithData(Object data)
-        {
-            List<Object> list = new List<Object>();
-            list.Add(data);
-            return GenerateResponseOkWithData(list);
+        public static RestResponse GenerateResponseOkWithData(Object data) {
+            RestResponse response = GenerateResponseOkEmpty();
+            response.AddObjectToData(data);
+            return response;
         }
-        public static RestResponse GenerateResponseOkWithData(List<Object> data)
-        {
+
+        public static RestResponse GenerateResponseOkWithData(List<Object> data) {
             RestResponse response = new RestResponse();
             ResponseHeader header = new ResponseHeader();
             header.ResultCode = RESPONSE_CODE_OK;
             header.Message = RESPONSE_OK_MSG;
             response.Header = header;
-            response.Data = data;
+            foreach(Object o in data) {
+                response.AddObjectToData(o);
+            }
             return response;
         }
 
-        public static RestResponse GenerateResponseErrorEmpty(){
+        public static RestResponse GenerateResponseErrorEmpty() {
             RestResponse response = new RestResponse();
             ResponseHeader header = new ResponseHeader();
             header.ResultCode = RESPONSE_CODE_ERROR;
             response.Header = header;
-            response.Data = new List<Object>();
             return response;
         }
 
-        public static RestResponse GenerateResponseErrorWith(ResponseError error){
+        public static RestResponse GenerateResponseErrorWith(ResponseError error) {
             RestResponse response = new RestResponse();
             ResponseHeader header = new ResponseHeader();
             List<ResponseError> errors = new List<ResponseError>();
@@ -55,17 +55,15 @@ namespace DocumentosOnlineAPI.Utils {
             header.ResultCode = RESPONSE_CODE_ERROR;
             header.Errors = errors;
             response.Header = header;
-            response.Data = new List<Object>();
             return response;
         }
 
-        public static RestResponse GenerateResponseErrorWith(List<ResponseError> errors){
+        public static RestResponse GenerateResponseErrorWith(List<ResponseError> errors) {
             RestResponse response = new RestResponse();
             ResponseHeader header = new ResponseHeader();
             header.ResultCode = RESPONSE_CODE_ERROR;
             header.Errors = errors;
             response.Header = header;
-            response.Data = new List<Object>();
             return response;
         }
     }

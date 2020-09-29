@@ -26,11 +26,11 @@ namespace DocumentosOnlineAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DocumentosDbContext>(
+            /*services.AddDbContext<DocumentosDbContext>(
                 o => o.UseSqlServer(
                     Configuration.GetConnectionString("DocumentosConStr")
                 )
-            );
+            );*/
             services.AddControllers();
             services.AddOpenApiDocument(configure =>
             {
@@ -47,11 +47,8 @@ namespace DocumentosOnlineAPI
                 app.UseOpenApi();
                 app.UseSwaggerUi3();
             }
-
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

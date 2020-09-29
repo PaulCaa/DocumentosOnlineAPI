@@ -10,13 +10,22 @@ namespace DocumentosOnlineAPI.Models {
         [Required]
         [StringLength(100)]
         public string Nombre { set; get; }
-        [Column("Descripcion", TypeName = "nText")]
-        public string Descripcion { set; get; }
+        [StringLength(50)]
+        public string Direccion { set; get; }
+        [StringLength(12)]
+        public string Telefono { set; get; }
+        [StringLength(50)]
+        public string Web { set; get; }
+        public List<Sector> Sectores { set; get; }
+        public List<Documento> Documentos { set; get; }
+        public List<Usuario> Usuarios { set; get; }
 
         public override string ToString(){
             return "{\"EmpresaId\": \"" + EmpresaId + "\", "
             + "\"Nombre\": \"" + Nombre + "\", "
-            + "\"Descripcion\": \"" + Descripcion + "\"}";
+            + "\"Direccion\": \"" + Direccion + "\", "
+            + "\"Telefono\": \"" + Telefono + "\", "
+            + "\"Web\": \"" + Web + "\"}";
         }
     }
 }
