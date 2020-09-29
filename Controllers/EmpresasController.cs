@@ -9,6 +9,7 @@ using DocumentosOnlineAPI.Services;
 using DocumentosOnlineAPI.Models;
 using DocumentosOnlineAPI.Models.Rest;
 using DocumentosOnlineAPI.Utils;
+using DocumentosOnlineAPI.Data;
 
 namespace DocumentosOnlineAPI.Controllers {
 
@@ -16,28 +17,29 @@ namespace DocumentosOnlineAPI.Controllers {
     [Route("api/[controller]")]
     public class EmpresasController : ControllerBase {
         private EmpresasService empresasService;
+        private SectoresService sectoresService;
 
         public EmpresasController(){
-            this.empresasService = new EmpresasService(); 
+            this.empresasService = new EmpresasService();
+            this.sectoresService = new SectoresService();
         }
 
         [HttpGet]
-        public IActionResult GetAll(){
+        public IActionResult GetAllEmpresas(){
             try{
-                Console.WriteLine("Se van a listar las empresas");
+                Console.WriteLine("[GetAllEmpresas] -> listar todas las empresas");
                 List<Empresa> result = empresasService.ListAllEmpresas();
-                if(result == null){
-                    result = new List<Empresa>();
+                if(result == null || result.Count() == 0){
+                    Console.WriteLine("[GetAllEmpresas] -> no hay resultados");
+                    RestResponse r = RestUtils.GenerateResponseOkEmpty();
+                    r.Header.Message = RestUtils.RESPONSE_NOTFOUND_MSG;
+                    return NotFound(r);
                 }
-                string empStr = "";
-                foreach(Empresa e in result){
-                    empStr += e.Nombre + " ";
-                }
-                Console.WriteLine("Resultado de busqueda: " + empStr);
-                RestResponse response = RestUtils.GenerateResponseOkWithData(result.ToString());
+                Console.WriteLine("[GetAllEmpresas] -> request exitosa");
+                RestResponse response = RestUtils.GenerateResponseOkWithData(result);
                 return Ok(response);
             }catch(Exception exception){
-                Console.WriteLine(RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                Console.WriteLine("[GetDocumentsByEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 RestResponse response = RestUtils.GenerateResponseErrorWith(
                     new ResponseError(
                         exception.Message,
@@ -53,19 +55,54 @@ namespace DocumentosOnlineAPI.Controllers {
         }
 
 
-        [HttpGet("/api/empresas/{id}")]
+        [HttpGet("/api/empresa/{id}")]
         public IActionResult GetDocumentsByEmpresa(int id){
             try{
-                Console.WriteLine("Se va a buscar empresa con id: " + id);
+                Console.WriteLine("[GetDocumentsByEmpresa] -> buscar empresa con id: " + id);
                 Empresa result = empresasService.FindEmpresaBy(id);
+                RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 if(result == null){
-                    result = new Empresa();
+                    Console.WriteLine("[GetDocumentsByEmpresa] -> no hay resultados");
+                    response.Header.Message = RestUtils.RESPONSE_NOTFOUND_MSG;
+                    return NotFound(response);
                 }
-                Console.WriteLine("Resultado de busqueda: " + result.ToString());
-                RestResponse response = RestUtils.GenerateResponseOkWithData(result);
+                Console.WriteLine("[GetDocumentsByEmpresa] -> request exitosa");
+                response.Header.Message = RestUtils.RESPONSE_OK_MSG;
+                response.AddObjectToData(result);
                 return Ok(response);
             }catch(Exception exception){
-                Console.WriteLine(RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                Console.WriteLine("[GetDocumentsByEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                RestResponse response = RestUtils.GenerateResponseErrorWith(
+                    new ResponseError(
+                        exception.Message,
+                        exception.GetType().ToString()
+                    )
+                );
+                response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    response
+                );
+            }
+        }
+
+        [HttpGet("/api/empresa/{id}/sectores/")]
+        public IActionResult GetSectoresByEmpresa(int id) {
+            try{
+                Console.WriteLine("[GetSectoresByEmpresa] -> listar sectores de la impresa id: " + id);
+                List<Sector> result = sectoresService.ListarSectoresPorEmpresa(id);
+                RestResponse response = RestUtils.GenerateResponseOkEmpty();
+                if(result == null){
+                    Console.WriteLine("[GetSectoresByEmpresa] -> no hay resultados");
+                    response.Header.Message = RestUtils.RESPONSE_NOTFOUND_MSG;
+                    return NotFound(response);
+                }
+                Console.WriteLine("[GetSectoresByEmpresa] -> request exitosa");
+                response.Header.Message = RestUtils.RESPONSE_OK_MSG;
+                response.AddObjectToData(result);
+                return Ok(response);
+            }catch(Exception exception) {
+                Console.WriteLine("[GetSectoresByEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 RestResponse response = RestUtils.GenerateResponseErrorWith(
                     new ResponseError(
                         exception.Message,

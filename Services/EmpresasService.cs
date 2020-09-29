@@ -7,30 +7,43 @@ using DocumentosOnlineAPI.Exceptions;
 
 namespace DocumentosOnlineAPI.Services {
     public class EmpresasService {
-        private DocumentosDbContext DbContext;
-
-        public EmpresasService() {
-            this.DbContext = new DocumentosDbContext();
-        }
 
         public List<Empresa> ListAllEmpresas() {
+            List<Empresa> empresas = new List<Empresa>();
             try{
-                Console.WriteLine("Buscando empresas en base de datos");
-                return DbContext.Empresas.ToList();
+                Console.WriteLine("[EmpresasService] -> listando empresas en base de datos");
+                using(DocumentosDbContext db = new DocumentosDbContext()){
+                    empresas = db.Empresas.ToList();
+                }
+                string str = "[";
+                foreach(Empresa o in empresas) str += o.ToString();
+                str += "]";
+                Console.WriteLine("[EmpresasService] -> se encontraron: " + str);
+                return empresas;
             } catch (Exception exception) {
-                Console.WriteLine("Se produjo un error error en acceso a la base de datos");
+                Console.WriteLine("[EmpresasService] -> se produjo un error error en acceso a la base de datos");
                 throw new DocumentosDatabaseException("Se produjo un error error en acceso a la base de datos",exception);
             }
         }
 
         public Empresa FindEmpresaBy(int id) {
+            Empresa empresa = null;
             try{
-                Console.WriteLine("Buscando empresa por id en base de datos");
-                return DbContext.Empresas.Find(id);
+                Console.WriteLine("[EmpresasService] -> buscando empresa por id en base de datos");
+                using(DocumentosDbContext db = new DocumentosDbContext()){
+                    empresa = db.Empresas.Find(id);
+                }
+                if(empresa == null){
+                    Console.WriteLine("[EmpresasService] -> no se encontraron resultado en base de datos");
+                    return null;
+                }
+                Console.WriteLine("[EmpresasService] -> resultado: " + empresa.ToString());
+                return empresa;
             } catch (Exception exception) {
-                Console.WriteLine("Se produjo un error error en acceso a la base de datos");
+                Console.WriteLine("[EmpresasService] -> se produjo un error error en acceso a la base de datos");
                 throw new DocumentosDatabaseException("Se produjo un error error en acceso a la base de datos",exception);
             }
         }
+
     }
 }

@@ -27,7 +27,7 @@ namespace DocumentosOnlineAPI.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //optionsBuilder.UseSqlServer("server=localhost;database=DocumentosOnline;user=user;password=password");
+                optionsBuilder.UseSqlServer("server=localhost;database=DocumentosOnline;user=user;password=password");
             }
         }
 
