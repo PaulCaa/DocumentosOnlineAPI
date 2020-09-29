@@ -33,7 +33,7 @@ namespace DocumentosOnlineAPI.Services {
                 using(DocumentosDbContext db = new DocumentosDbContext()){
                     empresa = db.Empresas.Find(id);
                 }
-                if(empresa == null){
+                if(empresa == null || empresa.EmpresaId == 0){
                     Console.WriteLine("[EmpresasService] -> no se encontraron resultado en base de datos");
                     return null;
                 }

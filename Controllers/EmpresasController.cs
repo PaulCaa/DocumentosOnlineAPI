@@ -89,7 +89,7 @@ namespace DocumentosOnlineAPI.Controllers {
         [HttpGet("/api/empresa/{id}/sectores/")]
         public IActionResult GetSectoresByEmpresa(int id) {
             try{
-                Console.WriteLine("[GetSectoresByEmpresa] -> listar sectores de la impresa id: " + id);
+                Console.WriteLine("[GetSectoresByEmpresa] -> listar sectores de la empresa id: " + id);
                 List<Sector> result = sectoresService.ListarSectoresPorEmpresa(id);
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 if(result == null){
@@ -103,6 +103,37 @@ namespace DocumentosOnlineAPI.Controllers {
                 return Ok(response);
             }catch(Exception exception) {
                 Console.WriteLine("[GetSectoresByEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                RestResponse response = RestUtils.GenerateResponseErrorWith(
+                    new ResponseError(
+                        exception.Message,
+                        exception.GetType().ToString()
+                    )
+                );
+                response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    response
+                );
+            }
+        }
+
+        [HttpGet("/api/empresa/{idEmpresa}/sector/{idSector}")]
+        public IActionResult GetSectorByEmpresa(int idEmpresa, int idSector) {
+            try{
+                Console.WriteLine("[GetSectorByEmpresa] -> buscar sector (" + idSector + ") en empresa id: " + idEmpresa);
+                Sector result = sectoresService.FindSectorBy(idEmpresa,idSector);
+                RestResponse response = RestUtils.GenerateResponseOkEmpty();
+                if(result == null){
+                    Console.WriteLine("[GetSectorByEmpresa] -> no hay resultados");
+                    response.Header.Message = RestUtils.RESPONSE_NOTFOUND_MSG;
+                    return NotFound(response);
+                }
+                Console.WriteLine("[GetSectorByEmpresa] -> request exitosa");
+                response.Header.Message = RestUtils.RESPONSE_OK_MSG;
+                response.AddObjectToData(result);
+                return Ok(response);
+            }catch(Exception exception) {
+                Console.WriteLine("[GetSectorByEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 RestResponse response = RestUtils.GenerateResponseErrorWith(
                     new ResponseError(
                         exception.Message,
