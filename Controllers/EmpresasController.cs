@@ -205,5 +205,64 @@ namespace DocumentosOnlineAPI.Controllers {
             }
         }
 
+        [HttpPost("/api/empresa/{idEmpresa}/sector")]
+        public IActionResult InsertNewSectorEmpresa([FromBody] SectorDTO body, int idEmpresa) {
+            try{
+                Console.WriteLine("[InsertNewSectorEmpresa] -> request: " + body.ToString());
+                // se valida param y body de request
+                if(body == null || body.Nombre == null || idEmpresa == 0) {
+                    Console.WriteLine("[InsertNewSectorEmpresa] -> falta sector o idEmpresa en request");
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_BADREQUEST_CODE,
+                            "Falta sector o idEmpresa en request"
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
+                    return BadRequest(responseErr);
+                }
+                // se realiza insersion
+                int result = empresasService.AddNewSectorInEmpresa(
+                    idEmpresa,
+                    ModelMapper.Map(body)
+                );
+                // se valida resultado de operacion
+                if(result == 0){
+                    Console.WriteLine("[InsertNewSectorEmpresa] -> operacion fallida");
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_INTERNAL_ERROR_MSG,
+                            "Operacion fallida, no se completo proceso"
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_ERROR_CODE;
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        responseErr
+                    );
+                }
+                body.EmpresaId = idEmpresa;
+                body.SectorId = result;
+                Console.WriteLine("[InsertNewSectorEmpresa] -> operacion exitosa");
+                return StatusCode(
+                    StatusCodes.Status201Created,
+                    RestUtils.GenerateResponseOkWithData(body)
+                );
+            } catch(Exception exception) {
+                Console.WriteLine("[InsertNewSectorEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                RestResponse response = RestUtils.GenerateResponseErrorWith(
+                    new ResponseError(
+                        exception.Message,
+                        exception.GetType().ToString()
+                    )
+                );
+                response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    response
+                );
+            }
+        }
+
     }
 }

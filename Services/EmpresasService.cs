@@ -66,5 +66,32 @@ namespace DocumentosOnlineAPI.Services {
             return idGenerated;
         }
 
+        public int AddNewSectorInEmpresa(int idEmpresa, Sector sector) {
+            Console.WriteLine("[EmpresasService] -> buscando empresa");
+            Empresa valid = FindEmpresaBy(idEmpresa);
+            if(valid == null || valid.Nombre == null) {
+                Console.WriteLine("[EmpresasService] -> no existe empresa id = " + idEmpresa);
+                return -99;
+            }
+            int idGenerated = 0;
+            try{
+                sector.EmpresaId = idEmpresa;
+                Console.WriteLine("[EmpresasService] -> insertando nuevo sector");
+                using(DocumentosDbContext db = new DocumentosDbContext()) {
+                    EntityEntry<Sector> result = db.Sectores.Add(sector);
+                    db.SaveChanges();
+                    idGenerated = result.Entity.SectorId;
+                }
+            } catch (Exception exception) {
+                Console.WriteLine("[EmpresasService] -> se produjo un error error en el proceso con la base de datos");
+                throw new DocumentosDatabaseException("Se produjo un error error en el proceso con la base de datos",exception);
+            }
+            if(idGenerated == 0) {
+                Console.WriteLine("[EmpresasService] -> no se completo proceso");
+            }
+            Console.WriteLine("[EmpresasService] -> se registro nuevo sector con id: " + idGenerated);
+            return idGenerated;
+        }
+
     }
 }

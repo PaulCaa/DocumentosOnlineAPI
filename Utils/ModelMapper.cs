@@ -24,5 +24,12 @@ namespace DocumentosOnlineAPI.Utils {
             return m;
         }
 
+        public static Sector Map(SectorDTO dto) {
+            Sector m = new Sector();
+            m.EmpresaId = dto.EmpresaId;
+            if(dto.Nombre != null) m.Nombre = dto.Nombre;
+            return m;
+        }
+
     }
 }
