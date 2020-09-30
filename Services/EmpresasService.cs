@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using DocumentosOnlineAPI.Data;
 using DocumentosOnlineAPI.Models;
+using DocumentosOnlineAPI.Models.DTO;
 using DocumentosOnlineAPI.Exceptions;
+using DocumentosOnlineAPI.Utils;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace DocumentosOnlineAPI.Services {
@@ -91,6 +93,29 @@ namespace DocumentosOnlineAPI.Services {
             }
             Console.WriteLine("[EmpresasService] -> se registro nuevo sector con id: " + idGenerated);
             return idGenerated;
+        }
+
+        public EmpresaDTO ModifyEmpresa(int idEmpresa, Empresa empresa) {
+            Console.WriteLine("[EmpresasService] -> buscando empresa con id: " + idEmpresa);
+            Empresa valid = FindEmpresaBy(idEmpresa);
+            if(valid == null || valid.Nombre == null) {
+                Console.WriteLine("[EmpresasService] -> no existe empresa id = " + idEmpresa);
+                return null;
+            }
+            Console.WriteLine("[EmpresasService] -> actualizando empresa...");
+            try{
+                if(empresa.Nombre != null) valid.Nombre = empresa.Nombre;
+                if(empresa.Direccion != null) valid.Direccion = empresa.Direccion;
+                if(empresa.Telefono != null) valid.Telefono = empresa.Telefono;
+                if(empresa.Web != null) valid.Web = empresa.Web;
+                using(DocumentosDbContext db = new DocumentosDbContext()) {
+                    EntityEntry<Empresa> result= db.Empresas.Update(valid);
+                }
+                return ModelMapper.Map(valid);
+            } catch (Exception exception) {
+                Console.WriteLine("[EmpresasService] -> se produjo un error error en el proceso con la base de datos");
+                throw new DocumentosDatabaseException("Se produjo un error error en el proceso con la base de datos",exception);
+            }
         }
 
     }

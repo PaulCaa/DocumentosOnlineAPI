@@ -240,6 +240,16 @@ namespace DocumentosOnlineAPI.Controllers {
                         StatusCodes.Status500InternalServerError,
                         responseErr
                     );
+                }else if(result == -99){
+                    Console.WriteLine("[InsertNewSectorEmpresa] -> operacion fallida");
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_NOTFOUND_MSG,
+                            "Operacion fallida, no se pudo insertar sector porque no hay empresa asociada al id" + idEmpresa
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_ERROR_CODE;
+                    return NotFound(responseErr);
                 }
                 body.EmpresaId = idEmpresa;
                 body.SectorId = result;
@@ -250,6 +260,57 @@ namespace DocumentosOnlineAPI.Controllers {
                 );
             } catch(Exception exception) {
                 Console.WriteLine("[InsertNewSectorEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                RestResponse response = RestUtils.GenerateResponseErrorWith(
+                    new ResponseError(
+                        exception.Message,
+                        exception.GetType().ToString()
+                    )
+                );
+                response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    response
+                );
+            }
+        }
+
+        [HttpPut]
+        public IActionResult UpdateEmpresa([FromBody] EmpresaDTO body){
+            try{
+                Console.WriteLine("[UpdateEmpresa] -> request body: " + body.ToString());
+                // se validan datos de entrada
+                if(body == null || body.Id == 0) {
+                    Console.WriteLine("[UpdateEmpresa] -> falta id de empresa en request body");
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_BADREQUEST_CODE,
+                            "Falta id de empresa en request body"
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
+                    return BadRequest(responseErr);
+                }
+                // se envia info a modificar
+                EmpresaDTO result = empresasService.ModifyEmpresa(
+                    body.Id,
+                    ModelMapper.Map(body)
+                );
+                // se valida resultado
+                if(result == null) {
+                    Console.WriteLine("[UpdateEmpresa] -> operacion fallida");
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_NOTFOUND_MSG,
+                            "Operacion fallida, no se puede modifica empresa , ya que no hay resultados asociados al id" + body.Id
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_ERROR_CODE;
+                    return NotFound(responseErr);
+                }
+                Console.WriteLine("[UpdateEmpresa] -> operacion exitosa");
+                return Ok(RestUtils.GenerateResponseOkWithData(result));
+            } catch(Exception exception) {
+                Console.WriteLine("[UpdateEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 RestResponse response = RestUtils.GenerateResponseErrorWith(
                     new ResponseError(
                         exception.Message,
