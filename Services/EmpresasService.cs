@@ -109,9 +109,33 @@ namespace DocumentosOnlineAPI.Services {
                 if(empresa.Telefono != null) valid.Telefono = empresa.Telefono;
                 if(empresa.Web != null) valid.Web = empresa.Web;
                 using(DocumentosDbContext db = new DocumentosDbContext()) {
-                    EntityEntry<Empresa> result= db.Empresas.Update(valid);
+                    EntityEntry<Empresa> result = db.Empresas.Update(valid);
+                    db.SaveChanges();
+                    valid = result.Entity;
                 }
                 return ModelMapper.Map(valid);
+            } catch (Exception exception) {
+                Console.WriteLine("[EmpresasService] -> se produjo un error error en el proceso con la base de datos");
+                throw new DocumentosDatabaseException("Se produjo un error error en el proceso con la base de datos",exception);
+            }
+        }
+
+        public EmpresaDTO DeleteEmpresa(int idEmpresa) {
+            Console.WriteLine("[EmpresasService] -> buscando empresa con id: " + idEmpresa);
+            Empresa reg = FindEmpresaBy(idEmpresa);
+            if(reg == null || reg.Nombre == null){
+                Console.WriteLine("[EmpresasService] -> no hay empresas con id: " + idEmpresa);
+                return null;
+            }
+            Console.WriteLine("[EmpresasService] -> se va a eliminar: " + reg.ToString());
+            try{
+                EmpresaDTO deleted = new EmpresaDTO();
+                using(DocumentosDbContext db = new DocumentosDbContext()){
+                    EntityEntry<Empresa> result = db.Empresas.Remove(reg);
+                    db.SaveChanges();
+                    deleted = ModelMapper.Map(result.Entity);
+                }
+                return deleted;
             } catch (Exception exception) {
                 Console.WriteLine("[EmpresasService] -> se produjo un error error en el proceso con la base de datos");
                 throw new DocumentosDatabaseException("Se produjo un error error en el proceso con la base de datos",exception);
