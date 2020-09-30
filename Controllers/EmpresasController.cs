@@ -55,22 +55,22 @@ namespace DocumentosOnlineAPI.Controllers {
 
 
         [HttpGet("/api/empresa/{id}")]
-        public IActionResult GetDocumentsByEmpresa(int id) {
+        public IActionResult GetEmpresaBy(int id) {
             try{
-                Console.WriteLine("[GetDocumentsByEmpresa] -> buscar empresa con id: " + id);
+                Console.WriteLine("[GetEmpresaBy] -> buscar empresa con id: " + id);
                 Empresa result = empresasService.FindEmpresaBy(id);
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 if(result == null){
-                    Console.WriteLine("[GetDocumentsByEmpresa] -> no hay resultados");
+                    Console.WriteLine("[GetEmpresaBy] -> no hay resultados");
                     response.Header.Message = RestUtils.RESPONSE_NOTFOUND_MSG;
                     return NotFound(response);
                 }
-                Console.WriteLine("[GetDocumentsByEmpresa] -> request exitosa");
+                Console.WriteLine("[GetEmpresaBy] -> request exitosa");
                 response.Header.Message = RestUtils.RESPONSE_OK_MSG;
                 response.AddObjectToData(result);
                 return Ok(response);
             }catch(Exception exception){
-                Console.WriteLine("[GetDocumentsByEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                Console.WriteLine("[GetEmpresaBy] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 RestResponse response = RestUtils.GenerateResponseErrorWith(
                     new ResponseError(
                         exception.Message,
