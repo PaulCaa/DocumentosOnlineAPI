@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using DocumentosOnlineAPI.Data;
 using DocumentosOnlineAPI.Models;
+using DocumentosOnlineAPI.Models.DTO;
 using DocumentosOnlineAPI.Exceptions;
+using DocumentosOnlineAPI.Utils;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace DocumentosOnlineAPI.Services {
@@ -64,6 +66,80 @@ namespace DocumentosOnlineAPI.Services {
             }
             Console.WriteLine("[EmpresasService] -> se registro nueva empresa con id: " + idGenerated);
             return idGenerated;
+        }
+
+        public int AddNewSectorInEmpresa(int idEmpresa, Sector sector) {
+            Console.WriteLine("[EmpresasService] -> buscando empresa");
+            Empresa valid = FindEmpresaBy(idEmpresa);
+            if(valid == null || valid.Nombre == null) {
+                Console.WriteLine("[EmpresasService] -> no existe empresa id = " + idEmpresa);
+                return -99;
+            }
+            int idGenerated = 0;
+            try{
+                sector.EmpresaId = idEmpresa;
+                Console.WriteLine("[EmpresasService] -> insertando nuevo sector");
+                using(DocumentosDbContext db = new DocumentosDbContext()) {
+                    EntityEntry<Sector> result = db.Sectores.Add(sector);
+                    db.SaveChanges();
+                    idGenerated = result.Entity.SectorId;
+                }
+            } catch (Exception exception) {
+                Console.WriteLine("[EmpresasService] -> se produjo un error error en el proceso con la base de datos");
+                throw new DocumentosDatabaseException("Se produjo un error error en el proceso con la base de datos",exception);
+            }
+            if(idGenerated == 0) {
+                Console.WriteLine("[EmpresasService] -> no se completo proceso");
+            }
+            Console.WriteLine("[EmpresasService] -> se registro nuevo sector con id: " + idGenerated);
+            return idGenerated;
+        }
+
+        public EmpresaDTO ModifyEmpresa(int idEmpresa, Empresa empresa) {
+            Console.WriteLine("[EmpresasService] -> buscando empresa con id: " + idEmpresa);
+            Empresa valid = FindEmpresaBy(idEmpresa);
+            if(valid == null || valid.Nombre == null) {
+                Console.WriteLine("[EmpresasService] -> no existe empresa id = " + idEmpresa);
+                return null;
+            }
+            Console.WriteLine("[EmpresasService] -> actualizando empresa...");
+            try{
+                if(empresa.Nombre != null) valid.Nombre = empresa.Nombre;
+                if(empresa.Direccion != null) valid.Direccion = empresa.Direccion;
+                if(empresa.Telefono != null) valid.Telefono = empresa.Telefono;
+                if(empresa.Web != null) valid.Web = empresa.Web;
+                using(DocumentosDbContext db = new DocumentosDbContext()) {
+                    EntityEntry<Empresa> result = db.Empresas.Update(valid);
+                    db.SaveChanges();
+                    valid = result.Entity;
+                }
+                return ModelMapper.Map(valid);
+            } catch (Exception exception) {
+                Console.WriteLine("[EmpresasService] -> se produjo un error error en el proceso con la base de datos");
+                throw new DocumentosDatabaseException("Se produjo un error error en el proceso con la base de datos",exception);
+            }
+        }
+
+        public EmpresaDTO DeleteEmpresa(int idEmpresa) {
+            Console.WriteLine("[EmpresasService] -> buscando empresa con id: " + idEmpresa);
+            Empresa reg = FindEmpresaBy(idEmpresa);
+            if(reg == null || reg.Nombre == null){
+                Console.WriteLine("[EmpresasService] -> no hay empresas con id: " + idEmpresa);
+                return null;
+            }
+            Console.WriteLine("[EmpresasService] -> se va a eliminar: " + reg.ToString());
+            try{
+                EmpresaDTO deleted = new EmpresaDTO();
+                using(DocumentosDbContext db = new DocumentosDbContext()){
+                    EntityEntry<Empresa> result = db.Empresas.Remove(reg);
+                    db.SaveChanges();
+                    deleted = ModelMapper.Map(result.Entity);
+                }
+                return deleted;
+            } catch (Exception exception) {
+                Console.WriteLine("[EmpresasService] -> se produjo un error error en el proceso con la base de datos");
+                throw new DocumentosDatabaseException("Se produjo un error error en el proceso con la base de datos",exception);
+            }
         }
 
     }

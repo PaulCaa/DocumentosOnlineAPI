@@ -12,7 +12,13 @@
 					"name": "Get Documentos por empresa",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "usuario",
+								"value": "pcaamano",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "http://localhost:5000/api/documentos/empresa/1",
 							"protocol": "http",
@@ -25,6 +31,78 @@
 								"documentos",
 								"empresa",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Documentos por sector",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "usuario",
+								"type": "text",
+								"value": "pcaamano"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/documentos/empresa/1/sector/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"documentos",
+								"empresa",
+								"1",
+								"sector",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get documento",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "usuario",
+								"value": "pcaamano",
+								"type": "text"
+							},
+							{
+								"key": "documento",
+								"value": "R038000950135",
+								"type": "text"
+							},
+							{
+								"key": "empresa",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "sector",
+								"value": "3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/documentos/get",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"documentos",
+								"get"
 							]
 						}
 					},
@@ -77,6 +155,85 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Insert new Empresa",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"testIsert\",\r\n    \"direccion\": \"Av. Zaraza 123, Buenos Aires\",\r\n    \"telefono\": \"46123456\",\r\n    \"web\": \"zaraza.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/empresas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"empresas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update data of Empresa",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 2,\r\n    \"nombre\": \"ISTEA\",\r\n    \"direccion\": \"Lavalle 648, Piso 8, CABA\",\r\n    \"telefono\": \"08102208148\",\r\n    \"web\": \"https://www.istea.edu.ar/\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/empresas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"empresas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Empresa",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/api/empresas/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"empresas",
+								"3"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
@@ -125,6 +282,37 @@
 								"1",
 								"sector",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert new sector",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Gerencia\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/empresa/2/sector",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"empresa",
+								"2",
+								"sector"
 							]
 						}
 					},
