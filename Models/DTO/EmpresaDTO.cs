@@ -10,9 +10,6 @@ namespace DocumentosOnlineAPI.Models.DTO {
         public string Direccion { set; get; }
         public string Telefono { set; get; }
         public string Web { set; get; }
-        public List<Sector> Sectores { set; get; }
-        public List<Documento> Documentos { set; get; }
-        public List<Usuario> Usuarios { set; get; }
 
         public override string ToString(){
             return "{\"Id\": \"" + Id + "\", "

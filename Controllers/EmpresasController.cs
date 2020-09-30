@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using DocumentosOnlineAPI.Services;
 using DocumentosOnlineAPI.Models;
+using DocumentosOnlineAPI.Models.DTO;
 using DocumentosOnlineAPI.Models.Rest;
 using DocumentosOnlineAPI.Utils;
 
@@ -133,6 +134,63 @@ namespace DocumentosOnlineAPI.Controllers {
                 return Ok(response);
             }catch(Exception exception) {
                 Console.WriteLine("[GetSectorByEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                RestResponse response = RestUtils.GenerateResponseErrorWith(
+                    new ResponseError(
+                        exception.Message,
+                        exception.GetType().ToString()
+                    )
+                );
+                response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    response
+                );
+            }
+        }
+
+        [HttpPost]
+        public IActionResult InsertEmpresa([FromBody] EmpresaDTO body) {
+            try{
+                Console.WriteLine("[InsertEmpresa] -> request: " + body.ToString());
+                // se valida body de request
+                if(body == null || body.Nombre == null) {
+                    Console.WriteLine("[InsertEmpresa] -> empresa sin nombre o body nulo");
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_BADREQUEST_CODE,
+                            "Empresa sin nombre o request body nulo"
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
+                    return BadRequest(responseErr);
+                }
+                // se realiza insersion
+                int result = empresasService.AddNewEmpresa(
+                    ModelMapper.Map(body)
+                );
+                // se valida resultado de operacion
+                if(result == 0){
+                    Console.WriteLine("[InsertEmpresa] -> operacion fallida");
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_INTERNAL_ERROR_MSG,
+                            "Operacion fallida, no se completo proceso"
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_ERROR_CODE;
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        responseErr
+                    );
+                }
+                body.Id = result;
+                Console.WriteLine("[InsertEmpresa] -> operacion exitosa");
+                return StatusCode(
+                    StatusCodes.Status201Created,
+                    RestUtils.GenerateResponseOkWithData(body)
+                );
+            } catch(Exception exception) {
+                Console.WriteLine("[InsertEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 RestResponse response = RestUtils.GenerateResponseErrorWith(
                     new ResponseError(
                         exception.Message,

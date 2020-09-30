@@ -4,6 +4,7 @@ using System.Linq;
 using DocumentosOnlineAPI.Data;
 using DocumentosOnlineAPI.Models;
 using DocumentosOnlineAPI.Exceptions;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace DocumentosOnlineAPI.Services {
     public class EmpresasService {
@@ -43,6 +44,26 @@ namespace DocumentosOnlineAPI.Services {
                 Console.WriteLine("[EmpresasService] -> se produjo un error error en acceso a la base de datos");
                 throw new DocumentosDatabaseException("Se produjo un error error en acceso a la base de datos",exception);
             }
+        }
+
+        public int AddNewEmpresa(Empresa empresa) {
+            int idGenerated = 0;
+            try{
+                Console.WriteLine("[EmpresasService] -> insertando nueva empresa");
+                using(DocumentosDbContext db = new DocumentosDbContext()) {
+                    EntityEntry<Empresa> result = db.Empresas.Add(empresa);
+                    db.SaveChanges();
+                    idGenerated = result.Entity.EmpresaId;
+                }
+            } catch (Exception exception) {
+                Console.WriteLine("[EmpresasService] -> se produjo un error error en el proceso con la base de datos");
+                throw new DocumentosDatabaseException("Se produjo un error error en el proceso con la base de datos",exception);
+            }
+            if(idGenerated == 0) {
+                Console.WriteLine("[EmpresasService] -> no se completo proceso");
+            }
+            Console.WriteLine("[EmpresasService] -> se registro nueva empresa con id: " + idGenerated);
+            return idGenerated;
         }
 
     }
