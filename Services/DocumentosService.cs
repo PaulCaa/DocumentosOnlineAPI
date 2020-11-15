@@ -111,6 +111,31 @@ namespace DocumentosOnlineAPI.Services {
             return documentoDTO;
         }
 
+        public int DeleteDocumento(string number, int idEmpresa, int idSector, string usuario){
+            if(!ValidateUser(usuario,idEmpresa,idSector)) {
+                throw new AccessDeniedException();
+            }
+            try {
+                List<Documento> toDelete = null;
+                using(DocumentosDbContext db = new DocumentosDbContext()){
+                    toDelete = db.Documentos.Where(d => d.Numero == number & d.EmpresaId == idEmpresa & d.SectorId == idSector).ToList();
+                }
+                if(toDelete.Count == 0) {
+                    Console.WriteLine("[DocumentosService] -> no se encontraron registro a eliminar");
+                    return 0;
+                }
+                using(DocumentosDbContext db = new DocumentosDbContext()) {
+                    db.Documentos.RemoveRange(toDelete);
+                    db.SaveChanges();
+                }
+                Console.WriteLine("[DocumentosService] -> registros eliminados: " + toDelete.Count);
+                return toDelete.Count;
+            } catch(Exception exception) {
+                Console.WriteLine("[DocumentosService] -> se produjo un error error en acceso a la base de datos");
+                throw new DocumentosDatabaseException("Se produjo un error error en acceso a la base de datos",exception);
+            }
+        }
+
         /**** LIST MODELT -> LIST DTO *****/
         private List<DocumentoDTO> ProcessResult(List<Documento> docs) {
             List<DocumentoDTO> dtoList = new List<DocumentoDTO>();
