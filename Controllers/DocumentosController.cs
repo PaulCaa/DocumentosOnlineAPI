@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Headers;
 using DocumentosOnlineAPI.Services;
 using DocumentosOnlineAPI.Models;
+using DocumentosOnlineAPI.Models.DTO;
 using DocumentosOnlineAPI.Models.Rest;
 using DocumentosOnlineAPI.Utils;
 using DocumentosOnlineAPI.Exceptions;
@@ -40,13 +41,13 @@ namespace DocumentosOnlineAPI.Controllers {
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 // busqueda de documentos
                 Console.WriteLine("[GetDocumentsByEmpresa] -> se van a buscar los documentos de la empresa con id: " + idEmpresa);
-                List<Documento> result = documentosService.FindDocumentosByEmpresa(usuario,idEmpresa);
+                List<DocumentoDTO> result = documentosService.FindDocumentosByEmpresa(usuario,idEmpresa);
                 // validacion de resultados
                 if(result == null || result.Count() == 0){
                     Console.WriteLine("[GetDocumentsByEmpresa] -> no se encontraron resultados");
                 }else{
                     Console.WriteLine("[GetDocumentsByEmpresa] -> imprimiendo resultados");
-                    foreach(Documento d in result){
+                    foreach(DocumentoDTO d in result){
                         response.AddObjectToData(d);
                     }
                 }
@@ -95,13 +96,13 @@ namespace DocumentosOnlineAPI.Controllers {
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 // busqueda de documentos
                 Console.WriteLine("[GetDocumentsBySector] -> se van a buscar los documentos de la empresa con id: " + idEmpresa + " y sector " + idSector);
-                List<Documento> result = documentosService.FindDocumentosBySector(usuario,idEmpresa,idSector);
+                List<DocumentoDTO> result = documentosService.FindDocumentosBySector(usuario,idEmpresa,idSector);
                 // validacion de resultados
                 if(result == null || result.Count() == 0){
                     Console.WriteLine("[GetDocumentsBySector] -> no se encontraron resultados");
                 }else{
                     Console.WriteLine("[GetDocumentsBySector] -> imprimiendo resultados");
-                    foreach(Documento d in result){
+                    foreach(DocumentoDTO d in result){
                         response.AddObjectToData(d);
                     }
                 }
@@ -153,7 +154,7 @@ namespace DocumentosOnlineAPI.Controllers {
                 }
                 // se ejecuta busqueda
                 Console.WriteLine("[GetDocumento] -> Buscar documento numero: " + documento);
-                List<Documento> result = documentosService.FindDocumentoWith(usuario,documento,empresa,sector);
+                List<DocumentoDTO> result = documentosService.FindDocumentoWith(usuario,documento,empresa,sector);
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 // se validan resultados
                 if(result == null || result.Count() == 0){
@@ -162,7 +163,7 @@ namespace DocumentosOnlineAPI.Controllers {
                     return NotFound(response);
                 }
                 Console.WriteLine("[GetDocumento] -> request exitosa");
-                foreach(Documento d in result) {
+                foreach(DocumentoDTO d in result) {
                     response.AddObjectToData(d);
                 }
                 return Ok(response);
