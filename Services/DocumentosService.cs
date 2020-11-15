@@ -6,6 +6,7 @@ using DocumentosOnlineAPI.Models;
 using DocumentosOnlineAPI.Models.DTO;
 using DocumentosOnlineAPI.Exceptions;
 using DocumentosOnlineAPI.Utils;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace DocumentosOnlineAPI.Services {
     public class DocumentosService {
@@ -71,6 +72,43 @@ namespace DocumentosOnlineAPI.Services {
                 Console.WriteLine("[DocumentosService] -> error en proceso de lectura en base de datos");
                 throw new DocumentosDatabaseException("Error en proceso de lectura en base de datos",exception);
             }
+        }
+
+        public DocumentoDTO AddNewDocument(DocumentoDTO documentoDTO, int idEmpresa, int idSector, string usuario) {
+            if(!ValidateUser(usuario,idEmpresa,idSector)) {
+                throw new AccessDeniedException();
+            }
+            try {
+                Console.WriteLine("[DocumentosService] -> insertando nuevo documento");
+                Documento documento = ModelMapper.Map(documentoDTO);
+                documento.EmpresaId = idEmpresa;
+                documento.SectorId = idSector;
+                int idInserted = 0;
+                Console.WriteLine("[DocumentosService] -> insertando documento: " + documento.ToString());
+                using(DocumentosDbContext db = new DocumentosDbContext()) {
+                    EntityEntry<Documento> result = db.Documentos.Add(documento);
+                    db.SaveChanges();
+                    idInserted = result.Entity.DocumentoId;
+                }
+                if(idInserted == 0){
+                    Console.WriteLine("[DocumentosService] -> operacion fallida");
+                    return null;
+                }
+                documentoDTO.DocumentoId = idInserted;
+                documentoDTO.Fecha = documento.Fecha.ToString();
+            } catch(Exception exception) {
+                Console.WriteLine("[DocumentosService] -> se produjo un error error en acceso a la base de datos");
+                throw new DocumentosDatabaseException("Se produjo un error error en acceso a la base de datos",exception);
+            }
+            // Armado de objeto respuesta no tiene que afectar el flujo, ya que se insertó registro en DB
+            try{
+                documentoDTO.Empresa = getNombreEmpresaBy(idEmpresa);
+                documentoDTO.Sector = getNombreSectorBy(idSector,idEmpresa);
+            } catch (Exception exception) {
+                Console.WriteLine("[DocumentosService] -> error al obtener nombre para respuesta: " + exception.Message);
+            }
+            Console.WriteLine("[DocumentosService] -> se registro documento con id" + documentoDTO.DocumentoId);
+            return documentoDTO;
         }
 
         /**** LIST MODELT -> LIST DTO *****/

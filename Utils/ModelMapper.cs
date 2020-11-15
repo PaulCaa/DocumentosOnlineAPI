@@ -50,10 +50,9 @@ namespace DocumentosOnlineAPI.Utils {
 
         public static Documento Map(DocumentoDTO dto) {
             Documento d = new Documento();
-            d.DocumentoId = dto.DocumentoId;
             if(dto.Numero != null) d.Numero = dto.Numero;
-            // TODO mapeo string DateTime
             if(dto.ImgPath != null) d.ImgPath = dto.ImgPath;
+            d.Fecha = DateTime.Now;
             return d;
         }
 
