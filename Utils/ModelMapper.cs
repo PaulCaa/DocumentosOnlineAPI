@@ -31,5 +31,31 @@ namespace DocumentosOnlineAPI.Utils {
             return m;
         }
 
+        public static SectorDTO Map(Sector s) {
+            SectorDTO dto = new SectorDTO();
+            dto.SectorId = s.SectorId;
+            dto.EmpresaId = s.EmpresaId;
+            if(s.Nombre != null) dto.Nombre = s.Nombre;
+            return dto;
+        }
+
+        public static DocumentoDTO Map(Documento d) {
+            DocumentoDTO dto = new DocumentoDTO();
+            dto.DocumentoId = d.DocumentoId;
+            if(d.Numero != null) dto.Numero = d.Numero;
+            if(d.Fecha != null) dto.Fecha = d.Fecha.ToString();
+            if(d.ImgPath != null) dto.ImgPath = d.ImgPath;
+            return dto;
+        }
+
+        public static Documento Map(DocumentoDTO dto) {
+            Documento d = new Documento();
+            d.DocumentoId = dto.DocumentoId;
+            if(dto.Numero != null) d.Numero = dto.Numero;
+            // TODO mapeo string DateTime
+            if(dto.ImgPath != null) d.ImgPath = dto.ImgPath;
+            return d;
+        }
+
     }
 }

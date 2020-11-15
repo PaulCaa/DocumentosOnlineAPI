@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using DocumentosOnlineAPI.Data;
 using DocumentosOnlineAPI.Models;
+using DocumentosOnlineAPI.Models.DTO;
 using DocumentosOnlineAPI.Exceptions;
+using DocumentosOnlineAPI.Utils;
 
 namespace DocumentosOnlineAPI.Services {
     public class DocumentosService {
 
-        public List<Documento> FindDocumentosByEmpresa(string usuario, int idEmpresa){
+        public List<DocumentoDTO> FindDocumentosByEmpresa(string usuario, int idEmpresa){
             if(!ValidateUser(usuario,idEmpresa)) {
                 throw new AccessDeniedException();
             }
@@ -19,7 +21,7 @@ namespace DocumentosOnlineAPI.Services {
                     docs = db.Documentos.Where(d => d.EmpresaId == idEmpresa).ToList();
                 }
                 Console.WriteLine("[DocumentosService] -> se encontraron " + docs.Count() + " resultados");
-                return docs;
+                return ProcessResult(docs);
             } catch(InvalidOperationException exception) {
                 Console.WriteLine("[DocumentosService] -> " + exception.GetType().ToString() + ": " + exception.Message);
                 return null;
@@ -29,7 +31,7 @@ namespace DocumentosOnlineAPI.Services {
             }
         }
 
-        public List<Documento> FindDocumentosBySector(string usuario, int idEmpresa, int idSector) {
+        public List<DocumentoDTO> FindDocumentosBySector(string usuario, int idEmpresa, int idSector) {
             if(!ValidateUser(usuario,idEmpresa,idSector)) {
                 throw new AccessDeniedException();
             }
@@ -40,7 +42,7 @@ namespace DocumentosOnlineAPI.Services {
                     docs = db.Documentos.Where(d => d.EmpresaId == idEmpresa & d.SectorId == idSector).ToList();
                 }
                 Console.WriteLine("[DocumentosService] -> se encontraron " + docs.Count() + " resultados");
-                return docs;
+                return ProcessResult(docs);
             } catch(InvalidOperationException exception) {
                 Console.WriteLine("[DocumentosService] -> " + exception.GetType().ToString() + ": " + exception.Message);
                 return null;
@@ -50,7 +52,7 @@ namespace DocumentosOnlineAPI.Services {
             }
         }
 
-        public List<Documento> FindDocumentoWith(string usuario, string number, int idEmpresa, int idSector) {
+        public List<DocumentoDTO> FindDocumentoWith(string usuario, string number, int idEmpresa, int idSector) {
             if(!ValidateUser(usuario,idEmpresa,idSector)) {
                 throw new AccessDeniedException();
             }
@@ -58,10 +60,10 @@ namespace DocumentosOnlineAPI.Services {
                 List<Documento> docs = null;
                 Console.WriteLine("[DocumentosService] -> buscando documento: " + number);
                 using(DocumentosDbContext db = new DocumentosDbContext()){
-                    docs = db.Documentos.Where(d => d.Numero == number & d.EmpresaId == idEmpresa & d.SectorId == idSector).ToList();
+                    docs = db.Documentos.Where(d => d.Numero == number && d.EmpresaId == idEmpresa && d.SectorId == idSector).ToList();
                 }
                 Console.WriteLine("[DocumentosService] -> se encontraron " + docs.Count() + " resultados");
-                return docs;
+                return ProcessResult(docs);
             } catch(InvalidOperationException exception) {
                 Console.WriteLine("[DocumentosService] -> " + exception.GetType().ToString() + ": " + exception.Message);
                 return null;
@@ -71,6 +73,45 @@ namespace DocumentosOnlineAPI.Services {
             }
         }
 
+        /**** LIST MODELT -> LIST DTO *****/
+        private List<DocumentoDTO> ProcessResult(List<Documento> docs) {
+            List<DocumentoDTO> dtoList = new List<DocumentoDTO>();
+            Console.WriteLine("[DocumentosService] -> procesando resultados");
+            foreach(Documento d in docs) {
+                DocumentoDTO dto = ModelMapper.Map(d);
+                dto.Empresa = getNombreEmpresaBy(d.EmpresaId);
+                dto.Sector = getNombreSectorBy(d.SectorId, d.EmpresaId);
+                dtoList.Add(dto);
+            }
+            return dtoList;
+        }
+        
+        /**** OBTENER NOMBRES ASOCIADOS A IDs *****/
+        private string getNombreEmpresaBy(int idEmpresa) {
+            Empresa e = null;
+            Console.WriteLine("[DocumentosService] -> buscando nombre de empresa " + idEmpresa);
+            using(DocumentosDbContext db = new DocumentosDbContext()) {
+                e = db.Empresas.Where(e => e.EmpresaId == idEmpresa).FirstOrDefault();
+            }
+            if(e == null) {
+                Console.WriteLine("[DocumentosService] -> no se encontro nombre de empresa asociado al id " + idEmpresa);
+                return "";
+            }
+            return e.Nombre;
+        }
+
+        private string getNombreSectorBy(int idSector, int idEmpresa) {
+            Sector s = null;
+            Console.WriteLine("[DocumentosService] -> buscando nombre de sector " + idSector);
+            using(DocumentosDbContext db = new DocumentosDbContext()) {
+                s = db.Sectores.Where(s => s.SectorId == idSector & s.EmpresaId == idEmpresa).FirstOrDefault();
+            }
+            if(s == null) {
+                Console.WriteLine("[DocumentosService] -> no se encontro nombre del sector asociado al id " + idEmpresa);
+                return "";
+            }
+            return s.Nombre;
+        }
 
         /**** VALIDACIONES DE PERMISOS *****/
         private bool ValidateUser(string user, int idEmpresa, int idSector) {
