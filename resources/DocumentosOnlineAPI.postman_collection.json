@@ -107,6 +107,89 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete Documento",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "usuario",
+								"value": "pcaamano",
+								"type": "text"
+							},
+							{
+								"key": "empresa",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "sector",
+								"value": "3",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/documentos/R033000909312",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"documentos",
+								"R033000909312"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert documento",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "usuario",
+								"type": "text",
+								"value": "pcaamano"
+							},
+							{
+								"key": "empresa",
+								"type": "text",
+								"value": "1"
+							},
+							{
+								"key": "sector",
+								"type": "text",
+								"value": "3"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"numero\": \"R033000909313\",\r\n    \"imgPath\": \"/sistemas/resources/E1S3R033000909313.pdf\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5000/api/documentos/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"documentos",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}
