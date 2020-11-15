@@ -193,5 +193,150 @@ namespace DocumentosOnlineAPI.Controllers {
             }
 
         }
+
+        [HttpPost("/api/documentos/")]
+        public IActionResult InsertDocumento(
+            [FromHeader] string usuario,
+            [FromHeader] int empresa,
+            [FromHeader] int sector,
+            [FromBody] DocumentoDTO body
+        ) {
+            try{
+                // se validan headers
+                if(usuario == null || empresa == 0 || sector == 0) {
+                    Console.WriteLine("[InsertDocumento] -> Faltan headers en la request");
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_BADREQUEST_CODE,
+                            "Faltan headers en la request"
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
+                    return BadRequest(responseErr);
+                }
+                Console.WriteLine("[InsertDocumento] -> request: " + body.ToString());
+                // se valida body
+                InputValidation(body);
+                body = documentosService.AddNewDocument(body,empresa,sector,usuario);
+                // se validan resultados
+                if(body == null) {
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_INTERNAL_ERROR_MSG,
+                            "Operacion fallida, no se completo proceso"
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_ERROR_CODE;
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        responseErr
+                    );
+                }
+                RestResponse response = RestUtils.GenerateResponseOkEmpty();
+                response.AddObjectToData(body);
+                return Ok(response);
+            } catch (Exception exception) {
+                RestResponse response = RestUtils.GenerateResponseErrorWith(
+                    new ResponseError(
+                        exception.Message,
+                        exception.GetType().ToString()
+                    )
+                );
+                if(typeof(WrongInputException).IsInstanceOfType(exception)) {
+                    Console.WriteLine("[InsertDocumento] ->" + exception.Message);
+                    response.Header.Message = exception.Message;
+                    return StatusCode(
+                        StatusCodes.Status400BadRequest,
+                        response
+                    );
+                }
+                // respuesta usuario sin permisos            
+                if(typeof(AccessDeniedException).IsInstanceOfType(exception)){
+                    Console.WriteLine("[InsertDocumento] ->" + exception.Message);
+                    response.Header.Message = exception.Message;
+                    return StatusCode(
+                        StatusCodes.Status403Forbidden,
+                        response
+                    );
+                }
+                // errores generales
+                Console.WriteLine("[InsertDocumento] ->" + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    response
+                );
+            }
+        }
+
+        private void InputValidation(DocumentoDTO input) {
+            if(input.Numero == null) throw new WrongInputException("Falta numero de documento");
+            if(input.ImgPath == null) throw new WrongInputException("Falta ImgPath del documento");
+        }
+
+        [HttpDelete("/api/documentos/{number}")]
+        public IActionResult DeleteDocumentBy(string number,
+            [FromHeader] string usuario,
+            [FromHeader] int empresa,
+            [FromHeader] int sector
+        ){
+            try {
+                // se validan headers
+                if(usuario == null || empresa == 0 || sector == 0) {
+                    Console.WriteLine("[DeleteDocumentBy] -> Faltan headers en la request");
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_BADREQUEST_CODE,
+                            "Faltan headers en la request"
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
+                    return BadRequest(responseErr);
+                }
+                // se valida id de documento
+                if(number == null || number == ""){
+                    Console.WriteLine("[DeleteDocumentBy] -> Numero de documento invalido");
+                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
+                        new ResponseError(
+                            RestUtils.RESPONSE_BADREQUEST_CODE,
+                            "Ingrese un numero de documento valido"
+                        )
+                    );
+                    responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
+                    return StatusCode(
+                        StatusCodes.Status400BadRequest,
+                        responseErr
+                    );
+                }
+                Console.WriteLine("[DeleteDocumentBy] -> Eliminando documento con numero: " + number);
+                int cantReg = documentosService.DeleteDocumento(number,empresa,sector,usuario);
+                RestResponse response = RestUtils.GenerateResponseOkEmpty();
+                response.Header.Message += ". Registros eliminados = " + cantReg;
+                return Ok(response);
+            } catch(Exception exception) {
+                RestResponse response = RestUtils.GenerateResponseErrorWith(
+                    new ResponseError(
+                        exception.Message,
+                        exception.GetType().ToString()
+                    )
+                );
+                // respuesta usuario sin permisos            
+                if(typeof(AccessDeniedException).IsInstanceOfType(exception)){
+                    Console.WriteLine("[InsertDocumento] ->" + exception.Message);
+                    response.Header.Message = exception.Message;
+                    return StatusCode(
+                        StatusCodes.Status403Forbidden,
+                        response
+                    );
+                }
+                // errores generales
+                Console.WriteLine("[DeleteDocumentBy] ->" + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
+                response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    response
+                );
+            }
+        }
     }
 }
