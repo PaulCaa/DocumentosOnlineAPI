@@ -36,6 +36,14 @@ namespace DocumentosOnlineAPI
             {
                 configure.Title = "API Documentacion Online";
             });
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder => {
+                        builder.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader().AllowAnyMethod();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,6 +56,7 @@ namespace DocumentosOnlineAPI
                 app.UseSwaggerUi3();
             }
             app.UseRouting();
+            app.UseCors();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
