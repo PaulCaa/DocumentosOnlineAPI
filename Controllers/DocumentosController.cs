@@ -4,9 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Headers;
 using DocumentosOnlineAPI.Services;
-using DocumentosOnlineAPI.Models;
 using DocumentosOnlineAPI.Models.DTO;
 using DocumentosOnlineAPI.Models.Rest;
 using DocumentosOnlineAPI.Utils;
@@ -24,15 +22,15 @@ namespace DocumentosOnlineAPI.Controllers {
         }
 
         [HttpGet("/api/documentos/empresa/{idEmpresa}")]
-        public IActionResult GetDocumentsByEmpresa([FromHeader] string usuario, int idEmpresa){
+        public IActionResult GetDocumentsByEmpresa(int? idEmpresa){
             try{
                 // se valida header
-                if(usuario == null) {
-                    Console.WriteLine("[GetDocumentsByEmpresa] -> falta header 'usuario' en la request");
+                if(idEmpresa == null || idEmpresa.Value == 0) {
+                    Console.WriteLine("[GetDocumentsByEmpresa] -> falta 'idEmpresa' en la request");
                     RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
                         new ResponseError(
                             RestUtils.RESPONSE_BADREQUEST_CODE,
-                            "Falta header 'usuario' en la request"
+                            "Falta 'idEmpresa' en la request"
                         )
                     );
                     responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
@@ -41,7 +39,7 @@ namespace DocumentosOnlineAPI.Controllers {
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 // busqueda de documentos
                 Console.WriteLine("[GetDocumentsByEmpresa] -> se van a buscar los documentos de la empresa con id: " + idEmpresa);
-                List<DocumentoDTO> result = documentosService.FindDocumentosByEmpresa(usuario,idEmpresa);
+                List<DocumentoDTO> result = documentosService.FindDocumentosByEmpresa(idEmpresa.Value);
                 // validacion de resultados
                 if(result == null || result.Count() == 0){
                     Console.WriteLine("[GetDocumentsByEmpresa] -> no se encontraron resultados");
@@ -59,15 +57,6 @@ namespace DocumentosOnlineAPI.Controllers {
                         exception.GetType().ToString()
                     )
                 );
-                // respuesta usuario sin permisos            
-                if(typeof(AccessDeniedException).IsInstanceOfType(exception)){
-                    Console.WriteLine("[GetDocumentsByEmpresa] ->" + exception.Message);
-                    response.Header.Message = exception.Message;
-                    return StatusCode(
-                        StatusCodes.Status403Forbidden,
-                        response
-                    );
-                }
                 // errores generales
                 Console.WriteLine("[GetDocumentsByEmpresa] ->" + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
@@ -79,11 +68,11 @@ namespace DocumentosOnlineAPI.Controllers {
         }
 
         [HttpGet("/api/documentos/empresa/{idEmpresa}/sector/{idSector}")]
-        public IActionResult GetDocumentsBySector([FromHeader] string usuario, int idEmpresa, int idSector){
+        public IActionResult GetDocumentsBySector(int? idEmpresa, int? idSector){
             try{
                 // se valida header
-                if(usuario == null) {
-                    Console.WriteLine("[GetDocumentsBySector] -> falta header 'usuario' en la request");
+                if(idEmpresa == null || idEmpresa.Value == 0 || idSector == null || idSector.Value == 0) {
+                    Console.WriteLine("[GetDocumentsBySector] -> falta 'idEmpresa' o 'idSector' en la request");
                     RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
                         new ResponseError(
                             RestUtils.RESPONSE_BADREQUEST_CODE,
@@ -96,7 +85,7 @@ namespace DocumentosOnlineAPI.Controllers {
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 // busqueda de documentos
                 Console.WriteLine("[GetDocumentsBySector] -> se van a buscar los documentos de la empresa con id: " + idEmpresa + " y sector " + idSector);
-                List<DocumentoDTO> result = documentosService.FindDocumentosBySector(usuario,idEmpresa,idSector);
+                List<DocumentoDTO> result = documentosService.FindDocumentosBySector(idEmpresa.Value,idSector.Value);
                 // validacion de resultados
                 if(result == null || result.Count() == 0){
                     Console.WriteLine("[GetDocumentsBySector] -> no se encontraron resultados");
@@ -114,15 +103,6 @@ namespace DocumentosOnlineAPI.Controllers {
                         exception.GetType().ToString()
                     )
                 );
-                // respuesta usuario sin permisos            
-                if(typeof(AccessDeniedException).IsInstanceOfType(exception)){
-                    Console.WriteLine("[GetDocumentsBySector] ->" + exception.Message);
-                    response.Header.Message = exception.Message;
-                    return StatusCode(
-                        StatusCodes.Status403Forbidden,
-                        response
-                    );
-                }
                 // errores generales
                 Console.WriteLine("[GetDocumentsBySector] ->" + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
@@ -133,28 +113,28 @@ namespace DocumentosOnlineAPI.Controllers {
             }
         }
 
-        [HttpGet("/api/documentos/get/")]
+        [HttpGet("/api/documentos/get/{docNumber}")]
         public IActionResult GetDocumento(
-            [FromHeader] string documento,
-            [FromHeader] string usuario,
-            [FromHeader] int empresa,
-            [FromHeader] int sector) {
+            string docNumber,
+            [FromHeader] int? empresa,
+            [FromHeader] int? sector) {
             try{
                 // se validan headers
-                if(documento == null || usuario == null || empresa == 0 || sector == 0) {
-                    Console.WriteLine("[GetDocumento] -> Faltan headers en la request");
+                if(docNumber == null || docNumber == "" || empresa == null || empresa.Value == 0 || 
+                sector== null || sector.Value == 0) {
+                    Console.WriteLine("[GetDocumento] -> Faltan parametros en la request");
                     RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
                         new ResponseError(
                             RestUtils.RESPONSE_BADREQUEST_CODE,
-                            "Faltan headers en la request"
+                            "Faltan parametros en la request"
                         )
                     );
                     responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
                     return BadRequest(responseErr);
                 }
                 // se ejecuta busqueda
-                Console.WriteLine("[GetDocumento] -> Buscar documento numero: " + documento);
-                List<DocumentoDTO> result = documentosService.FindDocumentoWith(usuario,documento,empresa,sector);
+                Console.WriteLine("[GetDocumento] -> Buscar documento numero: " + docNumber);
+                List<DocumentoDTO> result = documentosService.FindDocumentoWith(docNumber,empresa.Value,sector.Value);
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 // se validan resultados
                 if(result == null || result.Count() == 0){
@@ -174,15 +154,6 @@ namespace DocumentosOnlineAPI.Controllers {
                         exception.GetType().ToString()
                     )
                 );
-                // respuesta usuario sin permisos            
-                if(typeof(AccessDeniedException).IsInstanceOfType(exception)){
-                    Console.WriteLine("[GetDocumento] ->" + exception.Message);
-                    response.Header.Message = exception.Message;
-                    return StatusCode(
-                        StatusCodes.Status403Forbidden,
-                        response
-                    );
-                }
                 // errores generales
                 Console.WriteLine("[GetDocumento] ->" + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
@@ -194,21 +165,20 @@ namespace DocumentosOnlineAPI.Controllers {
 
         }
 
-        [HttpPost("/api/documentos/")]
+        [HttpPost("/api/documentos/empresa/{idEmpresa}/sector/{idSector}")]
         public IActionResult InsertDocumento(
-            [FromHeader] string usuario,
-            [FromHeader] int empresa,
-            [FromHeader] int sector,
+            int? idEmpresa,
+            int? idSector,
             [FromBody] DocumentoDTO body
         ) {
             try{
                 // se validan headers
-                if(usuario == null || empresa == 0 || sector == 0) {
-                    Console.WriteLine("[InsertDocumento] -> Faltan headers en la request");
+                if(idEmpresa == null || idEmpresa.Value == 0 || idSector == null || idSector.Value == 0) {
+                    Console.WriteLine("[InsertDocumento] -> Falta 'idEmpresa' o 'idSector' en la request");
                     RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
                         new ResponseError(
                             RestUtils.RESPONSE_BADREQUEST_CODE,
-                            "Faltan headers en la request"
+                            "Falta 'idEmpresa' o 'idSector' en la request"
                         )
                     );
                     responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
@@ -217,7 +187,7 @@ namespace DocumentosOnlineAPI.Controllers {
                 Console.WriteLine("[InsertDocumento] -> request: " + body.ToString());
                 // se valida body
                 InputValidation(body);
-                body = documentosService.AddNewDocument(body,empresa,sector,usuario);
+                body = documentosService.AddNewDocument(body,idEmpresa.Value,idSector.Value);
                 // se validan resultados
                 if(body == null) {
                     RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
@@ -250,15 +220,6 @@ namespace DocumentosOnlineAPI.Controllers {
                         response
                     );
                 }
-                // respuesta usuario sin permisos            
-                if(typeof(AccessDeniedException).IsInstanceOfType(exception)){
-                    Console.WriteLine("[InsertDocumento] ->" + exception.Message);
-                    response.Header.Message = exception.Message;
-                    return StatusCode(
-                        StatusCodes.Status403Forbidden,
-                        response
-                    );
-                }
                 // errores generales
                 Console.WriteLine("[InsertDocumento] ->" + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
                 response.Header.Message = RestUtils.RESPONSE_INTERNAL_ERROR_MSG;
@@ -274,42 +235,28 @@ namespace DocumentosOnlineAPI.Controllers {
             if(input.ImgPath == null) throw new WrongInputException("Falta ImgPath del documento");
         }
 
-        [HttpDelete("/api/documentos/{number}")]
-        public IActionResult DeleteDocumentBy(string number,
-            [FromHeader] string usuario,
-            [FromHeader] int empresa,
-            [FromHeader] int sector
+        [HttpDelete("/api/documentos/{docNumber}")]
+        public IActionResult DeleteDocumentBy(
+            string docNumber,
+            [FromHeader] int? empresa,
+            [FromHeader] int? sector
         ){
             try {
                 // se validan headers
-                if(usuario == null || empresa == 0 || sector == 0) {
-                    Console.WriteLine("[DeleteDocumentBy] -> Faltan headers en la request");
+                if(docNumber == null || docNumber == "" || empresa == null || empresa.Value == 0 || 
+                sector == null || sector.Value == 0) {
+                    Console.WriteLine("[DeleteDocumentBy] -> Faltan parametros en la request");
                     RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
                         new ResponseError(
                             RestUtils.RESPONSE_BADREQUEST_CODE,
-                            "Faltan headers en la request"
+                            "Faltan parametros en la request"
                         )
                     );
                     responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
                     return BadRequest(responseErr);
                 }
-                // se valida id de documento
-                if(number == null || number == ""){
-                    Console.WriteLine("[DeleteDocumentBy] -> Numero de documento invalido");
-                    RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
-                        new ResponseError(
-                            RestUtils.RESPONSE_BADREQUEST_CODE,
-                            "Ingrese un numero de documento valido"
-                        )
-                    );
-                    responseErr.Header.Message = RestUtils.RESPONSE_BADREQUEST_MSG;
-                    return StatusCode(
-                        StatusCodes.Status400BadRequest,
-                        responseErr
-                    );
-                }
-                Console.WriteLine("[DeleteDocumentBy] -> Eliminando documento con numero: " + number);
-                int cantReg = documentosService.DeleteDocumento(number,empresa,sector,usuario);
+                Console.WriteLine("[DeleteDocumentBy] -> Eliminando documento con numero: " + docNumber);
+                int cantReg = documentosService.DeleteDocumento(docNumber,empresa.Value,sector.Value);
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 response.Header.Message += ". Registros eliminados = " + cantReg;
                 return Ok(response);
