@@ -56,5 +56,17 @@ namespace DocumentosOnlineAPI.Utils {
             return d;
         }
 
+        public static UsuarioDTO Map(Usuario u, string empresa) {
+            UsuarioDTO dto = new UsuarioDTO();
+            if(u.UsuarioId != null) dto.UsuarioId = u.UsuarioId;
+            if(u.Nombre != null) dto.Nombre = u.Nombre;
+            if(u.Apellido != null) dto.Apellido = u.Apellido;
+            if(u.Email != null) dto.Email = u.Email;
+            dto.HashPwd = "#########";
+            dto.EmpresaId = u.EmpresaId;
+            dto.NombreEmpresa = empresa;
+            return dto;
+        }
+
     }
 }

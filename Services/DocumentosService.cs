@@ -11,6 +11,12 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 namespace DocumentosOnlineAPI.Services {
     public class DocumentosService {
 
+        private LoginService loginService;
+
+        public DocumentosService() {
+            this.loginService = new LoginService();
+        }
+
         public List<DocumentoDTO> FindDocumentosByEmpresa(int idEmpresa){
             try{
                 List<Documento> docs = null;
@@ -90,8 +96,8 @@ namespace DocumentosOnlineAPI.Services {
             }
             // Armado de objeto respuesta no tiene que afectar el flujo, ya que se insertó registro en DB
             try{
-                documentoDTO.Empresa = getNombreEmpresaBy(idEmpresa);
-                documentoDTO.Sector = getNombreSectorBy(idSector,idEmpresa);
+                documentoDTO.Empresa = loginService.getNombreEmpresaBy(idEmpresa);
+                documentoDTO.Sector = loginService.getNombreSectorBy(idSector,idEmpresa);
             } catch (Exception exception) {
                 Console.WriteLine("[DocumentosService] -> error al obtener nombre para respuesta: " + exception.Message);
             }
@@ -127,38 +133,11 @@ namespace DocumentosOnlineAPI.Services {
             Console.WriteLine("[DocumentosService] -> procesando resultados");
             foreach(Documento d in docs) {
                 DocumentoDTO dto = ModelMapper.Map(d);
-                dto.Empresa = getNombreEmpresaBy(d.EmpresaId);
-                dto.Sector = getNombreSectorBy(d.SectorId, d.EmpresaId);
+                dto.Empresa = loginService.getNombreEmpresaBy(d.EmpresaId);
+                dto.Sector = loginService.getNombreSectorBy(d.SectorId, d.EmpresaId);
                 dtoList.Add(dto);
             }
             return dtoList;
-        }
-        
-        /**** OBTENER NOMBRES ASOCIADOS A IDs *****/
-        private string getNombreEmpresaBy(int idEmpresa) {
-            Empresa e = null;
-            Console.WriteLine("[DocumentosService] -> buscando nombre de empresa " + idEmpresa);
-            using(DocumentosDbContext db = new DocumentosDbContext()) {
-                e = db.Empresas.Where(e => e.EmpresaId == idEmpresa).FirstOrDefault();
-            }
-            if(e == null) {
-                Console.WriteLine("[DocumentosService] -> no se encontro nombre de empresa asociado al id " + idEmpresa);
-                return "";
-            }
-            return e.Nombre;
-        }
-
-        private string getNombreSectorBy(int idSector, int idEmpresa) {
-            Sector s = null;
-            Console.WriteLine("[DocumentosService] -> buscando nombre de sector " + idSector);
-            using(DocumentosDbContext db = new DocumentosDbContext()) {
-                s = db.Sectores.Where(s => s.SectorId == idSector & s.EmpresaId == idEmpresa).FirstOrDefault();
-            }
-            if(s == null) {
-                Console.WriteLine("[DocumentosService] -> no se encontro nombre del sector asociado al id " + idEmpresa);
-                return "";
-            }
-            return s.Nombre;
         }
 
     }

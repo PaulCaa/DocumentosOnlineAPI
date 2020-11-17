@@ -3,52 +3,61 @@ using System.Collections.Generic;
 using System.Linq;
 using DocumentosOnlineAPI.Data;
 using DocumentosOnlineAPI.Models;
+using DocumentosOnlineAPI.Models.DTO;
+using DocumentosOnlineAPI.Utils;
 using DocumentosOnlineAPI.Exceptions;
 
 namespace DocumentosOnlineAPI.Services {
-
     public class LoginService {
 
-        public Boolean ValidateUser(string user, int idEmpresa, int idSector) {
-            if(!ValidateUser(user,idEmpresa)){
-                return false;
-            }
-            try {
-                UsuarioSector valid = null;
+        public UsuarioDTO ValidateUser(string userId, string hashPwd) {
+            try{
+                Usuario result = null;
                 using(DocumentosDbContext db = new DocumentosDbContext()) {
-                    valid = db.UsuarioSectores.Where(us => us.UsuarioId == user & us.SectorId == idSector).First();
+                    Console.WriteLine("[LoginService] -> Buscando registro de usuario");
+                    result = db.Usuarios.Where(u => u.UsuarioId == userId).First();
                 }
-                if(valid == null) {
-                    Console.WriteLine("[DocumentosService] -> usuario usuario sin permisos para este sector");
-                    return false;
+                if(result == null) {
+                    Console.WriteLine("[LoginService] -> No se encontraron resultados");
+                    return null;
                 }
-                Console.WriteLine("[DocumentosService] -> validacion de usuario exitosa");
-                return true;
-            } catch(InvalidOperationException exception) {
-                Console.WriteLine("[DocumentosService] -> " + exception.GetType().ToString() + ": " + exception.Message);
-                return false;
+                if(result.HashPwd != hashPwd){
+                    Console.WriteLine("[LoginService] -> Contraseña invalida");
+                    return null;
+                }
+                string empresa = getNombreEmpresaBy(result.EmpresaId);
+                return ModelMapper.Map(result,empresa);
             } catch(Exception exception) {
-                Console.WriteLine("[DocumentosService] -> error en operacion de validacion de usuario");
+                Console.WriteLine("[LoginService] -> error en operacion de validacion de usuario");
                 throw new DocumentosDatabaseException("Error en operacion de validacion de usuario", exception);
             }
         }
 
-        public Boolean ValidateUser(string user, int idEmpresa) {
-            try{
-                Console.WriteLine("[DocumentosService] -> iniciando validacion de usuario");
-                UsuariosService usuariosService = new UsuariosService();
-                Usuario result = usuariosService.FindUsuarioBy(user);
-                if(result == null || result.UsuarioId == null 
-                    || result.EmpresaId != idEmpresa) {
-                        Console.WriteLine("[DocumentosService] -> validacion de usuario fallida");
-                        return false;
-                }
-                Console.WriteLine("[DocumentosService] -> se encontro usuario: " + result.ToString());
-                return true;
-            } catch(Exception exception) {
-                Console.WriteLine("[DocumentosService] -> error en operacion de validacion de usuario");
-                throw new DocumentosDatabaseException("Error en operacion de validacion de usuario", exception);
+        public string getNombreEmpresaBy(int idEmpresa) {
+            Empresa e = null;
+            Console.WriteLine("[LoginService] -> buscando nombre de empresa " + idEmpresa);
+            using(DocumentosDbContext db = new DocumentosDbContext()) {
+                e = db.Empresas.Where(e => e.EmpresaId == idEmpresa).FirstOrDefault();
             }
+            if(e == null) {
+                Console.WriteLine("[LoginService] -> no se encontro nombre de empresa asociado al id " + idEmpresa);
+                return "";
+            }
+            return e.Nombre;
         }
+
+        public string getNombreSectorBy(int idSector, int idEmpresa) {
+            Sector s = null;
+            Console.WriteLine("[LoginService] -> buscando nombre de sector " + idSector);
+            using(DocumentosDbContext db = new DocumentosDbContext()) {
+                s = db.Sectores.Where(s => s.SectorId == idSector & s.EmpresaId == idEmpresa).FirstOrDefault();
+            }
+            if(s == null) {
+                Console.WriteLine("[LoginService] -> no se encontro nombre del sector asociado al id " + idEmpresa);
+                return "";
+            }
+            return s.Nombre;
+        }
+
     }
 }
