@@ -130,11 +130,10 @@ namespace DocumentosOnlineAPI.Controllers {
                 var claims = new [] {
                     new Claim(JwtRegisteredClaimNames.Sub, user.UsuarioId),
                     new Claim("name", user.Nombre + " " + user.Apellido),
-                    //new Claim("email", user.Email),
-                    //new Claim("empresaId", user.EmpresaId.ToString()),
+                    new Claim("email", user.Email),
+                    new Claim("empresaId", user.EmpresaId.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
-                Console.WriteLine("[Login] -> claims: " + claims);
                 var token = new JwtSecurityToken(
                     issuer: this.configuration["Jwt.Issuer"],
                     audience: this.configuration["Jwt.Audiencie"],
@@ -142,40 +141,13 @@ namespace DocumentosOnlineAPI.Controllers {
                     expires: DateTime.Now.AddMinutes(15),
                     signingCredentials:credentials
                 );
-                Console.WriteLine("[Login] -> token");
-                string tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-                Console.WriteLine("[Login] -> token: " + tokenString);
-                return tokenString;
+                return new JwtSecurityTokenHandler().WriteToken(token);
             } catch(Exception exception) {
                 Console.WriteLine("[Login] -> se produjo un error en la generacion de token");
                 Console.WriteLine("causa: " + exception.Message);
                 throw new TokenGenerationException(exception);
             }
         }
-
-        /*private void genTokn2(UsuarioDTO user) {
-            var claims = new [] {
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.UsuarioId),
-                new Claim("name", user.Apellido + ", " + user.Nombre),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("empresa", user.NombreEmpresa),
-                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ClaveZaraza"));
-            var credentials = new SigningCredentials(key,SecurityAlgorithms.HmacSha256);
-
-            JwtSecurityToken token = new JwtSecurityToken(
-                issuer: "http://localhost:5000",
-                audience: "http://localhost:4200",
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(15),
-                signingCredentials:credentials
-            );
-            Console.WriteLine(token);
-            var tokenStr = new JwtSecurityTokenHandler().WriteToken(token);
-            Console.WriteLine(tokenStr);
-        }*/
 
     }
 }
