@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DocumentosOnlineAPI.Services;
 using DocumentosOnlineAPI.Models.DTO;
 using DocumentosOnlineAPI.Models.Rest;
@@ -22,6 +24,7 @@ namespace DocumentosOnlineAPI.Controllers {
         }
 
         [HttpGet("/api/documentos/empresa/{idEmpresa}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult GetDocumentsByEmpresa(int? idEmpresa){
             try{
                 // se valida header
