@@ -12,6 +12,7 @@ namespace DocumentosOnlineAPI.Models.DTO {
         public string HashPwd { set; get; }
         public int EmpresaId { set; get; }
         public string NombreEmpresa { set; get; }
+        public string Token { set; get; }
 
         public override string ToString(){
             return "{\"UsuarioId\": \"" + UsuarioId + "\", "
@@ -20,7 +21,8 @@ namespace DocumentosOnlineAPI.Models.DTO {
             + "\"Email\": \"" + Email + "\", "
             + "\"HashPwd\": \"" + HashPwd + "\", "
             + "\"EmpresaId\": \"" + EmpresaId + "\","
-            + "\"NombreEmpresa\": \"" + NombreEmpresa + "\"}";
+            + "\"NombreEmpresa\": \"" + NombreEmpresa + "\","
+            + "\"Token\": \"" + Token +"\"}";
         }
     }
 }

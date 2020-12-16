@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using DocumentosOnlineAPI.Services;
 using DocumentosOnlineAPI.Models;
 using DocumentosOnlineAPI.Models.DTO;
@@ -58,7 +59,7 @@ namespace DocumentosOnlineAPI.Controllers {
             }
         }
 
-
+        [Authorize]
         [HttpGet("/api/empresa/{id}")]
         public IActionResult GetEmpresaBy(int id) {
             try{

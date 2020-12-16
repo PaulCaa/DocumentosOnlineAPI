@@ -24,7 +24,6 @@ namespace DocumentosOnlineAPI.Controllers {
         }
 
         [HttpGet("/api/documentos/empresa/{idEmpresa}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult GetDocumentsByEmpresa(int? idEmpresa){
             try{
                 // se valida header

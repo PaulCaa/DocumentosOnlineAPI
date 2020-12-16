@@ -54,11 +54,13 @@ namespace DocumentosOnlineAPI.Controllers {
                     Console.WriteLine("[Login] -> " + response.Header.Message);
                     return Unauthorized(response);
                 } else {
-                    response = RestUtils.GenerateResponseOkWithData(result);
+                    //response = RestUtils.GenerateResponseOkWithData(result);
+                    response = RestUtils.GenerateResponseOkEmpty();
                     Console.WriteLine("[Login] -> " + response.Header.Message);
                     string tokenString = this.generateToken(result);
                     Console.WriteLine("[Login] -> token generated");
-                    response.Data.Add(new {token = tokenString});
+                    result.Token = tokenString;
+                    response.Data.Add(result);
                     return Ok(response);
                 }
             } catch(Exception exception) {
@@ -82,14 +84,15 @@ namespace DocumentosOnlineAPI.Controllers {
             try{
                 Console.WriteLine("[Login] -> generating token");
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["Jwt:SecretKey"]));
-                var credentials = new SigningCredentials(securityKey,SecurityAlgorithms.HmacSha256);
+                var credentials = new SigningCredentials(securityKey,SecurityAlgorithms.HmacSha256Signature);
+
                 var claims = new [] {
                     new Claim(JwtRegisteredClaimNames.Sub, user.UsuarioId),
                     new Claim("name", user.Nombre + " " + user.Apellido),
                     new Claim("email", user.Email),
-                    new Claim("empresaId", user.EmpresaId.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
+                
                 var token = new JwtSecurityToken(
                     issuer: this.configuration["Jwt.Issuer"],
                     audience: this.configuration["Jwt.Audiencie"],
