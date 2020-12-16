@@ -15,7 +15,7 @@ namespace DocumentosOnlineAPI.Services {
                 Usuario result = null;
                 using(DocumentosDbContext db = new DocumentosDbContext()) {
                     Console.WriteLine("[LoginService] -> Buscando registro de usuario");
-                    result = db.Usuarios.Where(u => u.UsuarioId == userId).First();
+                    result = db.Usuarios.Where(u => u.UsuarioId == userId).FirstOrDefault();
                 }
                 if(result == null) {
                     Console.WriteLine("[LoginService] -> No se encontraron resultados");

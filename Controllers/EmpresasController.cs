@@ -36,7 +36,11 @@ namespace DocumentosOnlineAPI.Controllers {
                     return NotFound(r);
                 }
                 Console.WriteLine("[GetAllEmpresas] -> request exitosa");
-                RestResponse response = RestUtils.GenerateResponseOkWithData(result);
+                //RestResponse response = RestUtils.GenerateResponseOkWithData(result);
+                RestResponse response = RestUtils.GenerateResponseOkEmpty();
+                foreach(Empresa e in result){
+                    response.Data.Add(e);
+                }
                 return Ok(response);
             }catch(Exception exception){
                 Console.WriteLine("[GetAllEmpresas] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);

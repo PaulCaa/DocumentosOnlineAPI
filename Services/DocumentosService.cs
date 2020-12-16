@@ -53,12 +53,12 @@ namespace DocumentosOnlineAPI.Services {
             }
         }
 
-        public List<DocumentoDTO> FindDocumentoWith(string number, int idEmpresa, int idSector) {
+        public List<DocumentoDTO> FindDocumentoWith(string number) {
             try{
                 List<Documento> docs = null;
                 Console.WriteLine("[DocumentosService] -> buscando documento: " + number);
                 using(DocumentosDbContext db = new DocumentosDbContext()){
-                    docs = db.Documentos.Where(d => d.Numero == number && d.EmpresaId == idEmpresa && d.SectorId == idSector).ToList();
+                    docs = db.Documentos.Where(d => d.Numero == number).ToList();
                 }
                 Console.WriteLine("[DocumentosService] -> se encontraron " + docs.Count() + " resultados");
                 return ProcessResult(docs);
@@ -105,11 +105,11 @@ namespace DocumentosOnlineAPI.Services {
             return documentoDTO;
         }
 
-        public int DeleteDocumento(string number, int idEmpresa, int idSector){
+        public int DeleteDocumento(string number){
             try {
                 List<Documento> toDelete = null;
                 using(DocumentosDbContext db = new DocumentosDbContext()){
-                    toDelete = db.Documentos.Where(d => d.Numero == number & d.EmpresaId == idEmpresa & d.SectorId == idSector).ToList();
+                    toDelete = db.Documentos.Where(d => d.Numero == number).ToList();
                 }
                 if(toDelete.Count == 0) {
                     Console.WriteLine("[DocumentosService] -> no se encontraron registro a eliminar");

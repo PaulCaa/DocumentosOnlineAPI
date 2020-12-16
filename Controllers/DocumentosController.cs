@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DocumentosOnlineAPI.Services;
 using DocumentosOnlineAPI.Models.DTO;
 using DocumentosOnlineAPI.Models.Rest;
@@ -22,6 +24,7 @@ namespace DocumentosOnlineAPI.Controllers {
         }
 
         [HttpGet("/api/documentos/empresa/{idEmpresa}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult GetDocumentsByEmpresa(int? idEmpresa){
             try{
                 // se valida header
@@ -114,14 +117,10 @@ namespace DocumentosOnlineAPI.Controllers {
         }
 
         [HttpGet("/api/documentos/get/{docNumber}")]
-        public IActionResult GetDocumento(
-            string docNumber,
-            [FromHeader] int? empresa,
-            [FromHeader] int? sector) {
+        public IActionResult GetDocumento(string docNumber) {
             try{
                 // se validan headers
-                if(docNumber == null || docNumber == "" || empresa == null || empresa.Value == 0 || 
-                sector== null || sector.Value == 0) {
+                if(docNumber == null || docNumber == "") {
                     Console.WriteLine("[GetDocumento] -> Faltan parametros en la request");
                     RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
                         new ResponseError(
@@ -134,7 +133,7 @@ namespace DocumentosOnlineAPI.Controllers {
                 }
                 // se ejecuta busqueda
                 Console.WriteLine("[GetDocumento] -> Buscar documento numero: " + docNumber);
-                List<DocumentoDTO> result = documentosService.FindDocumentoWith(docNumber,empresa.Value,sector.Value);
+                List<DocumentoDTO> result = documentosService.FindDocumentoWith(docNumber);
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 // se validan resultados
                 if(result == null || result.Count() == 0){
@@ -236,15 +235,10 @@ namespace DocumentosOnlineAPI.Controllers {
         }
 
         [HttpDelete("/api/documentos/{docNumber}")]
-        public IActionResult DeleteDocumentBy(
-            string docNumber,
-            [FromHeader] int? empresa,
-            [FromHeader] int? sector
-        ){
+        public IActionResult DeleteDocumentBy(string docNumber){
             try {
                 // se validan headers
-                if(docNumber == null || docNumber == "" || empresa == null || empresa.Value == 0 || 
-                sector == null || sector.Value == 0) {
+                if(docNumber == null || docNumber == "") {
                     Console.WriteLine("[DeleteDocumentBy] -> Faltan parametros en la request");
                     RestResponse responseErr = RestUtils.GenerateResponseErrorWith(
                         new ResponseError(
@@ -256,7 +250,7 @@ namespace DocumentosOnlineAPI.Controllers {
                     return BadRequest(responseErr);
                 }
                 Console.WriteLine("[DeleteDocumentBy] -> Eliminando documento con numero: " + docNumber);
-                int cantReg = documentosService.DeleteDocumento(docNumber,empresa.Value,sector.Value);
+                int cantReg = documentosService.DeleteDocumento(docNumber);
                 RestResponse response = RestUtils.GenerateResponseOkEmpty();
                 response.Header.Message += ". Registros eliminados = " + cantReg;
                 return Ok(response);
