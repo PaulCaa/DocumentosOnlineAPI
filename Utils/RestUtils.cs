@@ -35,7 +35,7 @@ namespace DocumentosOnlineAPI.Utils {
             return response;
         }
 
-        public static RestResponse GenerateResponseOkWithData(List<Object> data) {
+        public static RestResponse GenerateResponseOkWithListData(List<Object> data) {
             RestResponse response = new RestResponse();
             ResponseHeader header = new ResponseHeader();
             header.ResultCode = RESPONSE_OK_CODE;
