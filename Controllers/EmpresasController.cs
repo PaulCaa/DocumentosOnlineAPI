@@ -103,7 +103,10 @@ namespace DocumentosOnlineAPI.Controllers {
                 }
                 Console.WriteLine("[GetSectoresByEmpresa] -> request exitosa");
                 response.Header.Message = RestUtils.RESPONSE_OK_MSG;
-                response.AddObjectToData(result);
+                //response.AddObjectToData(result);
+                foreach(Sector s in result){
+                    response.Data.Add(s);
+                }
                 return Ok(response);
             }catch(Exception exception) {
                 Console.WriteLine("[GetSectoresByEmpresa] -> " + RestUtils.RESPONSE_INTERNAL_ERROR_MSG);
